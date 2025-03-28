@@ -1,0 +1,135 @@
+{
+    "Despesas B\u00e1sicas": {
+        "Alimenta\u00e7\u00e3o": [
+            "Mercado",
+            "Restaurante",
+            "Lanches",
+            "Padaria",
+            "Suplementa\u00e7\u00e3o"
+        ],
+        "Assinaturas": [
+            "Telefone",
+            "Fotos",
+            "Stream"
+        ],
+        "Transporte": [
+            "Aplicativo",
+            "Carro manuten\u00e7\u00e3o",
+            "Carro melhorias",
+            "Estacionamento",
+            "Combust\u00edvel"
+        ],
+        "Casa": [
+            "Diarista Alimenta\u00e7\u00e3o",
+            "Diarista Limpeza",
+            "\u00c1gua e Luz",
+            "Jardineiro",
+            "Manuten\u00e7\u00e3o Casa",
+            "Material de limpeza"
+        ],
+        "Cuidado pessoal": [
+            "Academia",
+            "Cabeleireiro",
+            "Est\u00e9tica",
+            "Sa\u00fade"
+        ],
+        "Vestu\u00e1rio": [
+            "Roupas",
+            "Cal\u00e7ados",
+            "Acess\u00f3rios"
+        ],
+        "Seguro": [
+            "Carro",
+            "Vida",
+            "Residencial"
+        ],
+        "Esporte": [
+            "Academia",
+            "Equipamento"
+        ],
+        "F\u00e9rias": [
+            "Passagem",
+            "Hospedagem",
+            "Alimenta\u00e7\u00e3o",
+            "Passeios"
+        ]
+    },
+    "Despesas Profissionais": {
+        "Taxa": [
+            "Banco",
+            "Plataforma"
+        ],
+        "Gestor": [
+            "Gest\u00e3o"
+        ],
+        "Estagiario": [
+            "Est\u00e1gio"
+        ],
+        "Projetos": [
+            "Projeto1",
+            "Projeto2",
+            "Projeto3"
+        ]
+    },
+    "Doa\u00e7\u00e3o": {
+        "Presentes": [
+            "Anivers\u00e1rio",
+            "Natal"
+        ],
+        "UDV": [
+            "D\u00edzimo"
+        ]
+    },
+    "Investimento": {
+        "Bens Materias": [
+            "Equipamento"
+        ],
+        "F\u00e9rias": [
+            "Passagem",
+            "Hospedagem",
+            "Alimenta\u00e7\u00e3o",
+            "Passeios"
+        ],
+        "Casa": [
+            "Aluguel",
+            "Condom\u00ednio",
+            "\u00c1gua",
+            "Luz",
+            "G\u00e1s",
+            "Telefone",
+            "Internet"
+        ],
+        "Kite": [
+            "Material"
+        ],
+        "Escrit\u00f3rio": [
+            "Material"
+        ]
+    },
+    "Emprestimos": {
+        "Bloqueio Judicial": [
+            "Bloqueio Judicial"
+        ],
+        "Financeamento": [
+            "Financeamento"
+        ],
+        "Juros": [
+            "Juros"
+        ],
+        "Fundo Abreu": [
+            "Fundo Abreu"
+        ],
+        "Ingrid": [
+            "Ingrid"
+        ],
+        "Terceiros": [
+            "Terceiros"
+        ],
+        "Encontro de contas": [
+            "Encontro de contas"
+        ],
+        "Saque": [
+            "Saque"
+        ]
+    }
+}
