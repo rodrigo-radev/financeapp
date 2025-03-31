@@ -26,7 +26,6 @@ def upload_csv(conta):
     if upload_csv is not None:
         if conta == 'Itau':
             lancamentos = bc.Itau.csvread(upload_csv)
-            lancamento = pf.Itens()
             item = pf.Item()
             for i in lancamentos:
                 item.set_account(conta)
@@ -35,6 +34,8 @@ def upload_csv(conta):
             pass
         elif conta == 'MercadoPago':
             pass
+        elif conta == 'NovoBanco':
+            lancamentos = bc.NovoBanco.csvread(upload_csv)
         else:
             pass
     
@@ -49,16 +50,11 @@ def upload_xls(conta):
         if conta == 'Itau':
             lancamentos = bc.Itau.xlsread(upload_xls)
             lancamento = pf.Itens()
-            item = pf.Item()
-            for row in lancamentos.itertuples():
-                if row.valor is not None:
-                    item.set_account(conta)
-                    item.set_date(row.data.strftime("%d/%m/%Y"))
-                    item.set_date_payment(item.date)
-                    item.set_name(row.lancamento)
-                    item.set_price(row.valor)
-                    lancamento.add(item.to_dict())
-            processado = True
+            processado = lancamento.add_lancamento(lancamentos,conta)
+        elif conta == "NovoBanco":
+            lancamentos = bc.NovoBanco.xlsread(upload_xls)
+            lancamento = pf.Itens()
+            processado = lancamento.add_lancamento(lancamentos,conta)
         elif conta == 'Bradesco':
             pass
         elif conta == 'MercadoPago':
