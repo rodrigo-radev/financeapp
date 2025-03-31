@@ -91,7 +91,7 @@ def exibir_database():
         if mostrar and teste:
             st.write(unificado.to_dict())
         elif mostrar and not teste:
-            st.write(pd.DataFrame(unificado.to_dict()['itens']))
+            st.write(pd.DataFrame(unificado.to_dict()))
 
         with columns[2]:
             if st.button("Classificar",'classificar'):

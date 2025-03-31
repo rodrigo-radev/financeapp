@@ -3,6 +3,7 @@ class Itau:
     def xlsread(file_path):
         df = pd.read_excel(
             file_path,
+            engine='xlrd',
             sheet_name="Lançamentos",
             skiprows=9,  # Skip
             usecols="A:E",
@@ -45,8 +46,9 @@ class NovoBanco:
     def xlsread(file_path):
         df = pd.read_excel(
             file_path,
+            engine='openpyxl',
             sheet_name="Lançamentos",
-            skiprows=9,  # Skip
+            skiprows=10,  # Skip
             usecols="A:G",
             header=0 
         )
