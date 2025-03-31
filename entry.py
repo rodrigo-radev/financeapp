@@ -1,71 +1,79 @@
 import streamlit as st
-import pdfplumber, os
-import treat as t
 import outs as o
-from item import item
+import perfil as pf
+import bancos as bc
 from datetime import datetime
-import json
+dados = pf.Dados()
 
-def read_pdf(uploaded_file):
-    pdf_text = ""
-    file_name = uploaded_file.name
-    try:
-        if uploaded_file is not None:
-            st.write("Arquivo carregado com sucesso!")
+def upload_pdf(conta):
+    st.title("Upload PDF")
+    upload_pdf = st.file_uploader("ENVIE UM ARQUIVO PDF", type='pdf')
+    
+    if upload_pdf is not None:
+        if conta == 'Itau':
+            lancamentos = bc.Itau.pdfread(upload_pdf)
+        elif conta == 'Bradesco':
+            pass
+        elif conta == 'MercadoPago':
+            pass
+        else:
+            pass
 
-            # Lendo o PDF
-            try:
-                with pdfplumber.open(uploaded_file) as pdf:
-                    for page in pdf.pages:
-                        text = page.extract_text()
-                        pdf_text += text
-            except Exception as e:
-                st.write(f"Erro ao ler o arquivo. Tente novamente.\n{e}")
-    except Exception as e:
-        st.write(f"Erro ao carregar o arquivo. Tente novamente.\n{e}")
+def upload_csv(conta):
+    st.title("Upload CSV")
+    upload_csv = st.file_uploader("ENVIE UM ARQUIVO EM FORMATO CSV", type="csv")
 
-    # Retorna o texto extraído do PDF e o nome do arquivo
-    return pdf_text, file_name
+    if upload_csv is not None:
+        if conta == 'Itau':
+            lancamentos = bc.Itau.csvread(upload_csv)
+            lancamento = pf.Itens()
+            item = pf.Item()
+            for i in lancamentos:
+                item.set_account(conta)
+                item.set_date(i['Data'])
+        elif conta == 'Bradesco':
+            pass
+        elif conta == 'MercadoPago':
+            pass
+        else:
+            pass
+    
+    st.button("Voltar", on_click=o.voltar,key="voltar")
 
-def upload_pdf():
-    st.title("Carregar PDF")
-    uploaded_file = st.file_uploader("Envie um arquivo PDF", type="pdf")
+def upload_xls(conta):
+    st.title("Upload arquivo tipo Excel")
+    upload_xls = st.file_uploader("ENVIE UM ARQUIVO DO TIPO .XLS,XLSX",type=['xls','xlsx'])
+    processado = False
 
-    if uploaded_file is not None:
-        pdf_text, file_name = read_pdf(uploaded_file)
-        st.session_state['pdf_text'] = pdf_text
-        st.session_state['file_name'] = file_name
+    if upload_xls is not None:
+        if conta == 'Itau':
+            lancamentos = bc.Itau.xlsread(upload_xls)
+            lancamento = pf.Itens()
+            item = pf.Item()
+            for row in lancamentos.itertuples():
+                if row.valor is not None:
+                    item.set_account(conta)
+                    item.set_date(row.data.strftime("%d/%m/%Y"))
+                    item.set_date_payment(item.date)
+                    item.set_name(row.lancamento)
+                    item.set_price(row.valor)
+                    lancamento.add(item.to_dict())
+            processado = True
+        elif conta == 'Bradesco':
+            pass
+        elif conta == 'MercadoPago':
+            pass
+        else:
+            pass
 
-    if 'pdf_text' in st.session_state:
-        pdf_text = st.session_state['pdf_text']
-        file_name = st.session_state['file_name']
-
-        #Remove extensão de arquivo .pdf
-        file_name = file_name.replace(".pdf","")
-
-        if st.button("Gerar JSON"):
-            with st.spinner("Gerando..."):
-                json_file_path = f"./database/{file_name}.json"
-                if os.path.exists(json_file_path):
-                    st.warning(f"O arquivo {file_name}.json já existe e não será salvo novamente.")
-
-                    result = t.ler_json(json_file_path)
-                    st.session_state['result'] = result
-                else:
-                    result = t.to_data(pdf_text)
-                    
-                    #salvar result em arquivo
-                    with open(json_file_path, "w") as json_file:
-                        json.dump(result, json_file)
-                    #t.tratar_data(result)
-                    #o.salva_json(json_file_path,result)
-                    st.session_state['result'] = result
-
-    if 'result' in st.session_state:
-        result = st.session_state['result']
-        # Exibir resultado formatado
-        st.json(result)
-        st.write(result)
+    if processado:          
+        if st.button("Salvar"):
+            json_file_path = "./database/auto.csv"
+            o.to_csv(lancamento,json_file_path)
+            
+            #Após salvar limpar a lista de gastos
+            lancamento.reset()
+            st.success(f"Gastos salvos em {json_file_path}")
 
     st.button("Voltar", on_click=o.voltar,key="voltar")
 
@@ -73,11 +81,13 @@ def manual_entry():
     st.title("Entrada Manual")
 
     #Dados para entrada manual
-    lancamento = item()
+    lancamento = pf.Item()
+    perfil = pf.Dados()
     
-    arquivo_categorias = json.loads(open("categorias.json").read())
-    contas_correntes = ["ITAÚ","BRADESCO","BB","C6","Neon","Nubank"]
-    cartoes_credito = {"CC Nubank":1,"CC Bradesco":5,"CC Itaú Black":17,"CC Itaú Master":6,"CC MercadoPago":7,"CC SAMS":1}
+    arquivo_categorias = perfil.get_categorias()
+    #arquivo_categorias = json.loads(open("categorias.json").read())
+    contas_correntes = perfil.get_contas()
+    cartoes_credito = perfil.get_cartoes()
     complemento = ""
 
 
@@ -134,9 +144,12 @@ def manual_entry():
             if 'gastos' not in st.session_state:
                 st.session_state['gastos'] = []
 
-            st.session_state['gastos'].append(lancamento.to_dict())
-
-            st.success("Gasto adicionado com sucesso!")
+            adicionado = lancamento.to_dict()
+            if(adicionado in st.session_state['gastos']):
+                st.warning("Gasto já adicionado/repetido")
+            else:
+                st.session_state['gastos'].append(adicionado)
+                st.success("Gasto adicionado com sucesso!")
 
         if 'gastos' in st.session_state:
             st.write("Gastos adicionados:")
@@ -145,7 +158,10 @@ def manual_entry():
     with coluna2:
         if st.button("Salvar"):
             json_file_path = "./database/entrada_manual.csv"
-            o.to_csv({"gastos": st.session_state['gastos']},json_file_path)
+            o.to_csv(st.session_state['gastos'],json_file_path)
+            
+            #Após salvar limpar a lista de gastos
+            st.session_state['gastos'] = []
             st.success(f"Gastos salvos em {json_file_path}")
 
     st.button("Voltar", on_click=o.voltar,key="voltar")
