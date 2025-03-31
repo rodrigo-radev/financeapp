@@ -1,6 +1,5 @@
 import json, os, csv
 import streamlit as st
-import treat as t
 import matplotlib.pyplot as plt
 import pandas as pd
 
