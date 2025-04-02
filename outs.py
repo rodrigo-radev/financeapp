@@ -1,6 +1,5 @@
 import json, os, csv
 import streamlit as st
-import matplotlib.pyplot as plt
 import pandas as pd
 
 def voltar():
@@ -138,7 +137,7 @@ def exibir_graficos():
 
     # Criar seleção de mês
     meses_disponiveis = df['Mês/Ano'].unique()
-    mes_selecionado = st.selectbox("Selecione o mês", sorted(meses_disponiveis, reverse=True))
+    mes_selecionado = st.selectbox("Selecione o mês", sorted(meses_disponiveis, reverse=True),index=16)
     
     # Filtrar pelo mês selecionado
     df_filtrado = df[df['Mês/Ano'] == mes_selecionado]
