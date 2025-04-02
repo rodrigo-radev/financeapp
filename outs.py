@@ -34,7 +34,6 @@ def to_csv(itens, file_path,reset=False):
             # Escreve os dados da lista de itens
             for item in itens:
                 writer.writerow(item)
-
     else:
         try:
 
@@ -105,9 +104,9 @@ def exibir_database():
     st.button("Voltar", on_click=voltar,key="voltar")
 
 def classificar_itens(itens):
-    from skttest4 import classificacao
+    import skttest4 as sk
     for i in itens.get_all():
-        classificacao(i)
+        sk.classificacao(i)
     try:
         to_csv(itens.to_dict(),"./database/classificado.csv", True)
     except Exception as e:
@@ -117,6 +116,7 @@ def classificar_itens(itens):
         st.write(df)
 
 def exibir_graficos():
+    import plotly.express as px
     st.title("Gráficos")
     st.write("Aqui você pode visualizar gráficos da base de dados.")
     import perfil
@@ -129,65 +129,40 @@ def exibir_graficos():
     unificado = unificar(auto, manual)
     
     # Converter para DataFrame
-    df = pd.DataFrame(unificado.to_dict())
+    df = pd.DataFrame.from_dict(unificado.to_dict())
+    df['VALOR'] = pd.to_numeric(df['VALOR'])  # Converte para float
+    df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'],dayfirst=True)
+    df['Mês/Ano'] = df['DATA CAIXA'].dt.strftime('%Y-%m')
+    df['Tipo'] = df['VALOR'].apply(lambda x: 'Receita' if x > 0 else 'Gasto')  # Define tipo de transação
 
-    # Converter a coluna VALOR para float, tratando valores inválidos
-    df["VALOR"] = pd.to_numeric(df["VALOR"], errors='coerce')
 
-    # Soma apenas os valores negativos
-    soma_negativos = df[df["VALOR"] < 0]["VALOR"].sum()
-    st.write(f"Soma dos valores negativos: {soma_negativos}")
-
-    # Soma apenas os valores positivos
-    soma_positivos = df[df["VALOR"] > 0]["VALOR"].sum()
-    st.write(f"Soma dos valores positivos: {soma_positivos}")
+    # Criar seleção de mês
+    meses_disponiveis = df['Mês/Ano'].unique()
+    mes_selecionado = st.selectbox("Selecione o mês", sorted(meses_disponiveis, reverse=True))
     
-    st.write(f"SOMA TOTAL: {soma_negativos + soma_positivos}")
-
-    # Filtrar valores maiores que 1000 e menores que -1000
-    df_extremos = df[(df["VALOR"] > 10000) | (df["VALOR"] < -10000)]
-    grouped_extremos_positivos = df_extremos[df_extremos["VALOR"] > 0].groupby("POTE")["VALOR"].sum().reset_index()
-    grouped_extremos_negativos = df_extremos[df_extremos["VALOR"] < 0].groupby("POTE")["VALOR"].sum().reset_index()
-
-    # Filtrar valores entre -1000 e 1000
-    df_intermediarios = df[(df["VALOR"] >= -10000) & (df["VALOR"] <= 10000)]
-    grouped_intermediarios_positivos = df_intermediarios[df_intermediarios["VALOR"] > 0].groupby("POTE")["VALOR"].sum().reset_index()
-    grouped_intermediarios_negativos = df_intermediarios[df_intermediarios["VALOR"] < 0].groupby("POTE")["VALOR"].sum().reset_index()
-
-    # Gráfico para valores extremos positivos
-    fig1, ax1 = plt.subplots()
-    ax1.bar(grouped_extremos_positivos["POTE"], grouped_extremos_positivos["VALOR"], color="green")
-    ax1.set_title("Soma dos Valores Positivos por POTE (Extremos: >1000)")
-    ax1.set_xlabel("POTE")
-    ax1.set_ylabel("Soma dos Valores")
-    plt.xticks(rotation=90)
-    st.pyplot(fig1)
-
-    # Gráfico para valores extremos negativos
-    fig2, ax2 = plt.subplots()
-    ax2.bar(grouped_extremos_negativos["POTE"], grouped_extremos_negativos["VALOR"], color="red")
-    ax2.set_title("Soma dos Valores Negativos por POTE (Extremos: <-1000)")
-    ax2.set_xlabel("POTE")
-    ax2.set_ylabel("Soma dos Valores")
-    plt.xticks(rotation=90)
-    st.pyplot(fig2)
-
-    # Gráfico para valores intermediários positivos
-    fig3, ax3 = plt.subplots()
-    ax3.bar(grouped_intermediarios_positivos["POTE"], grouped_intermediarios_positivos["VALOR"], color="blue")
-    ax3.set_title("Soma dos Valores Positivos por POTE (Intermediários: -1000 a 1000)")
-    ax3.set_xlabel("POTE")
-    ax3.set_ylabel("Soma dos Valores")
-    plt.xticks(rotation=90)
-    st.pyplot(fig3)
-
-    # Gráfico para valores intermediários negativos
-    fig4, ax4 = plt.subplots()
-    ax4.bar(grouped_intermediarios_negativos["POTE"], grouped_intermediarios_negativos["VALOR"], color="orange")
-    ax4.set_title("Soma dos Valores Negativos por POTE (Intermediários: -1000 a 1000)")
-    ax4.set_xlabel("POTE")
-    ax4.set_ylabel("Soma dos Valores")
-    plt.xticks(rotation=90)
-    st.pyplot(fig4)
+    # Filtrar pelo mês selecionado
+    df_filtrado = df[df['Mês/Ano'] == mes_selecionado]
+    
+    # Criar DataFrames separados para receitas e gastos
+    df_receitas = df_filtrado[df_filtrado['Tipo'] == 'Receita'].groupby('CATEGORIA')['VALOR'].sum().reset_index()
+    df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].groupby('CATEGORIA')['VALOR'].sum().reset_index()
+    df_gastos['VALOR'] = df_gastos['VALOR'].abs()  # Garante que os valores de gastos sejam positivos
+    
+    # Criar gráficos separados
+    if not df_receitas.empty:
+        fig_receitas = px.bar(df_receitas, x='CATEGORIA', y='VALOR', color='CATEGORIA',
+                              title=f'Receitas por Categoria - {mes_selecionado}',
+                              labels={'VALOR': 'Valor (R$)', 'CATEGORIA': 'Categoria'})
+        st.plotly_chart(fig_receitas)
+    else:
+        st.write("Nenhuma receita encontrada para este mês.")
+    
+    if not df_gastos.empty:
+        fig_gastos = px.bar(df_gastos, x='CATEGORIA', y='VALOR', color='CATEGORIA',
+                            title=f'Gastos por Categoria - {mes_selecionado}',
+                            labels={'VALOR': 'Valor (R$)', 'CATEGORIA': 'Categoria'})
+        st.plotly_chart(fig_gastos)
+    else:
+        st.write("Nenhum gasto encontrado para este mês.")
 
     st.button("Voltar", on_click=voltar, key="voltar")

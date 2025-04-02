@@ -287,7 +287,10 @@ class Itens:
                     if row.valor is not None:
                         item.set_account(conta)
                         item.set_date(row.data.strftime("%d/%m/%Y"))
-                        item.set_date_payment(item.date)
+                        try:
+                            item.set_date_payment(row.data_payment.strftime("%d/%m/%Y"))
+                        except:
+                            item.set_date_payment(item.date)
                         item.set_name(row.lancamento)
                         item.set_price(row.valor)
                         self.add(item.to_dict())

@@ -55,9 +55,9 @@ def upload_xls(conta):
             lancamentos = bc.NovoBanco.xlsread(upload_xls)
             lancamento = pf.Itens()
             processado = lancamento.add_lancamento(lancamentos,conta)
-        elif conta == 'Bradesco':
+        elif conta == 'BRADESCO':
             pass
-        elif conta == 'MercadoPago':
+        elif conta == 'CC MercadoPago':
             pass
         else:
             pass
@@ -81,7 +81,6 @@ def manual_entry():
     perfil = pf.Dados()
     
     arquivo_categorias = perfil.get_categorias()
-    #arquivo_categorias = json.loads(open("categorias.json").read())
     contas_correntes = perfil.get_contas()
     cartoes_credito = perfil.get_cartoes()
     complemento = ""
@@ -133,7 +132,7 @@ def manual_entry():
     with col3:
         lancamento.subcategory = st.selectbox("Subcategoria",arquivo_categorias[lancamento.type][lancamento.category])
 
-    coluna1, coluna2 = st.columns(2)
+    coluna1, coluna2, coluna3 = st.columns(3)
 
     with coluna1:
         if st.button("Adicionar"):
@@ -159,5 +158,13 @@ def manual_entry():
             #Após salvar limpar a lista de gastos
             st.session_state['gastos'] = []
             st.success(f"Gastos salvos em {json_file_path}")
+
+    with coluna3:
+        if st.button("Exportar",key='exportar'):
+            file = './database/entrada_manual.csv'
+            import pandas as pd
+            expo = pd.read_csv(file)
+            expo.to_excel('database/novoexport.xlsx')
+            st.success("Arquivo exportado")
 
     st.button("Voltar", on_click=o.voltar,key="voltar")

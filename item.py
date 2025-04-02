@@ -1,4 +1,4 @@
-import json, csv
+import json
 
 class item:
     def __init__(self,

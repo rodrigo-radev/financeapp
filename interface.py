@@ -2,7 +2,6 @@ import streamlit as st
 import entry as e
 import outs as o
 import perfil
-import skttest4
 from streamlit_option_menu import option_menu
 perfil = perfil.Dados()
 contas = list(perfil.get_cartoes())
@@ -32,7 +31,7 @@ def home():
     
     st.divider()
 
-    st.session_state['Banco'] = st.selectbox('Selecione o banco:',contas,index=6)
+    st.session_state['Banco'] = st.selectbox('Selecione o banco:',contas,index=13)
     if st.button("Rerun"):
         st.rerun()
 

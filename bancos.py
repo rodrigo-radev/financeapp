@@ -42,50 +42,70 @@ class Itau:
     
     def pdfread(upload_pdf):
         pass
+
 class NovoBanco:
     def xlsread(file_path):
-        df = pd.read_excel(
-            file_path,
-            engine='openpyxl',
-            sheet_name="Lançamentos",
-            skiprows=10,  # Skip
-            usecols="A:G",
-            header=0 
-        )
+        try:
+            df = pd.read_excel(
+                file_path,
+                engine='openpyxl',
+                sheet_name="ConsultaSaldosMovimentos",
+                skiprows=9,  # Skip
+                usecols="A:G",
+                header=0)
+        except:
+            try:
+                df = pd.read_excel(
+                file_path,
+                engine='xlrd',
+                sheet_name="ConsultaSaldosMovimentos",
+                skiprows=9,  # Skip
+                usecols="A:G",
+                header=0)
+            except Exception as e:
+                print("\n\n\n",e,'\n\n\n')
+                try:
+                    df = pd.read_xml(file_path,encoding='latin1')
+                except Exception as f:
+                    print("\n",f,"\n\n\n\n\n\n\n")
+                    return pd.DataFrame()
 
         # Clean column names
         df.columns = [col.strip().lower() for col in df.columns]
-        df.columns = ['Data Operação','Data Valor','Tipo','Descrição','Débito' ,'Crédito', 'Saldo Controlo']
+        df.columns = ['Data Operação','Data valor','Tipo','Descrição','Débito' ,'Crédito', 'Saldo Controlo']
         df.rename(columns={
-            'Data Operação': 'DATA_COMPETÊNCIA',
-            'Data Valor': 'DATA_CAIXA',
+            'Data Operação': 'data',
+            'Data valor': 'data_payment',
             'Tipo':'Tipo',
-            'Descrição': 'DESCRICAO',
+            'Descrição': 'lancamento',
             'Débito': 'DEBITO',
             'Crédito': 'CREDITO',
-            'Saldo Controlo':'Saldo_Controlo'
+            'Saldo Controlo':'SALDO_CONTROLO'
         }, inplace=True)
 
         # Convert date column to datetime
-        df['DATA_CAIXA'] = pd.to_datetime(df['data'], dayfirst=True, errors='coerce')
-        df['DATA_COMPETÊNCIA'] = pd.to_datetime(df['data'], dayfirst=True, errors='coerce')
+        df['data_payment'] = pd.to_datetime(df['data_payment'], format='%d-%m-%Y', errors='coerce')
+        df['data'] = pd.to_datetime(df['data'], format='%d-%m-%Y', errors='coerce')
 
-        # Criar a coluna VALOR: Débito como negativo e Crédito como positivo
-        df['VALOR'] = df['CREDITO'].fillna(0) - df['DEBITO'].fillna(0)
+        # Criar a coluna valor: Débito como negativo e Crédito como positivo
+        df['DEBITO'] = pd.to_numeric(df['DEBITO'], errors='coerce').fillna(0)
+        df['CREDITO'] = pd.to_numeric(df['CREDITO'], errors='coerce').fillna(0)
+
+        df['valor'] = df['DEBITO'] + df['CREDITO']
 
         # Converter colunas de valores para numérico
-        df['VALOR'] = pd.to_numeric(df['VALOR'], errors='coerce')
+        df['valor'] = pd.to_numeric(df['valor'], errors='coerce')
         df['SALDO_CONTROLO'] = pd.to_numeric(df['SALDO_CONTROLO'], errors='coerce')
 
         # Drop rows where value is NaN (empty rows)
-        df = df.dropna(how='all', subset=['VALOR'])
+        df = df.dropna(how='all', subset=['valor'])
 
         # Forward fill dates para transações no mesmo dia
-        df['DATA_CAIXA'] = df['DATA_CAIXA'].ffill()
-        df['DATA_COMPETÊNCIA'] = df['DATA_COMPETÊNCIA'].ffill()
+        df['data_payment'] = df['data_payment'].ffill()
+        df['data'] = df['data'].ffill()
 
         # Sort by date (newest first)
-        df = df.sort_values('data', ascending=False)
+        df = df.sort_values('data_payment', ascending=False)
 
         # Reset index
         df = df.reset_index(drop=True)
