@@ -2,7 +2,7 @@ streamlit
 pandas==2.2.1
 numpy==1.26.4
 nltk
-sklearn
+scikit-learn
 plotly
 openpyxl
 xrld
