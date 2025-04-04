@@ -12,15 +12,11 @@ def upload_pdf(conta):
     if upload_pdf is not None:
         if conta == 'Itau':
             lancamentos = bc.Itau.pdfread(upload_pdf)
-        elif conta == 'Bradesco':
-            st.warning(bc.Banco_generico.output())
-        elif conta == 'MercadoPago':
-            st.warning(bc.Banco_generico.output())
         else:
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
             
     st.button("Voltar", on_click=o.voltar,key="voltar")
-    
+
 def upload_csv(conta):
     st.title("Upload CSV")
     upload_csv = st.file_uploader("ENVIE UM ARQUIVO EM FORMATO CSV", type="csv")
@@ -33,13 +29,13 @@ def upload_csv(conta):
                 item.set_account(conta)
                 item.set_date(i['Data'])
         elif conta == 'Bradesco':
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
         elif conta == 'MercadoPago':
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
         elif conta == 'NovoBanco':
             lancamentos = bc.NovoBanco.csvread(upload_csv)
         else:
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
     
     st.button("Voltar", on_click=o.voltar,key="voltar")
 
@@ -58,11 +54,11 @@ def upload_xls(conta):
             lancamento = pf.Itens()
             processado = lancamento.add_lancamento(lancamentos,conta)
         elif conta == 'BRADESCO':
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
         elif conta == 'CC MercadoPago':
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
         else:
-            st.warning(bc.Banco_generico.output())
+            st.warning("Ainda não implementado")
 
     if processado:          
         if st.button("Salvar"):

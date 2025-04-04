@@ -1,5 +1,7 @@
 import pandas as pd
 class Banco_generico:
+    def __init__(self):
+        pass
     def output(self):
         return "Ainda não implementado"
 class Itau:
