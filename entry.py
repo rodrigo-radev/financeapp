@@ -18,7 +18,9 @@ def upload_pdf(conta):
             st.warning(bc.Banco_generico.output())
         else:
             st.warning(bc.Banco_generico.output())
-
+            
+    st.button("Voltar", on_click=o.voltar,key="voltar")
+    
 def upload_csv(conta):
     st.title("Upload CSV")
     upload_csv = st.file_uploader("ENVIE UM ARQUIVO EM FORMATO CSV", type="csv")
