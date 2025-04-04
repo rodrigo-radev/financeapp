@@ -1,16 +1,14 @@
 import pandas as pd
-import nltk
-import perfil as pf
+import nltk 
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 
+caminho_csv = "./dadosv3.csv"
 
-caminho_csv = r"./database/exportexcel.csv"
-
-df = pd.read_csv(caminho_csv)
+df = pd.read_csv(caminho_csv, delimiter=';')
 
 df = df.dropna(subset=['DESCRIÇÃO', 'POTE', 'CATEGORIA', 'SUBCATEGORIA'])
 
@@ -80,19 +78,14 @@ print("Avaliação Subcategoria: ")
 print(classification_report(y_test_subcategoria, y_pred_subcategoria))
 
 #Realiza a classificação
-def classificacao(item):
-    import perfil
-
-    descricao_tfidf = tfidf_vectorizer.transform([item.get_name()])
+def classificacao(descricao):
+    descricao_tfidf = tfidf_vectorizer.transform([descricao])
 
     pote_pred = label_encoder_pote.inverse_transform(clf_pote.predict(descricao_tfidf))
     categoria_pred = label_encoder_categoria.inverse_transform(clf_categoria.predict(descricao_tfidf))
     subcategoria_pred = label_encoder_subcategoria.inverse_transform(clf_subcategoria.predict(descricao_tfidf))
 
-
-    item.set_type(pote_pred[0])
-    item.set_category(categoria_pred[0])
-    item.set_subcategory(subcategoria_pred[0])
+    return pote_pred[0], categoria_pred[0], subcategoria_pred[0]
 
 #é necessario??
 def apply_classifier(descricao):
@@ -122,7 +115,7 @@ def add_transacao(data_competencia, data_caixa, valor, descricao, conta):
     return transacao
 
 #Preenche csv
-def preencher_csv(caminho_csv):
+def preencher_csv_arquivo(caminho_csv):
     df = pd.read_csv(caminho_csv)
 
     for i, row in df.iterrows():
@@ -135,7 +128,7 @@ def preencher_csv(caminho_csv):
     df.to_csv("./saida.csv", index=False)
     print("CSV preenchido com sucesso!")
     
-def preencher_csv2(caminho_csv):
+def preencher_csv(df):
     for i, row in df.iterrows():
         pote, categoria, subcategoria = apply_classifier(row['DESCRIÇÃO'])
 
@@ -143,16 +136,19 @@ def preencher_csv2(caminho_csv):
         df.loc[i, 'CATEGORIA'] = categoria
         df.loc[i, 'SUBCATEGORIA'] = subcategoria
 
-    df.to_csv("./saida.csv", index=False)
+    df.to_csv("./saida2.csv", index=False)
     print("CSV preenchido com sucesso!")
-    
 
-#print(add_transacao('2025-03-20', '2025-03-20', 100.00, 'R. Almeida Drywall', 'ITAU'))
 
-#dados = pd.read_csv("./dadosv3.csv", delimiter=';')
+##Testando funções
+##Cria uma transação e a classifica automaticamente
+print(add_transacao('2025-03-20', '2025-03-20', 100.00, 'PIX HARMONIA LOCACOES', 'ITAU'))
 
-#dados['DATA CAIXA'] = pd.to_datetime(dados['DATA CAIXA'], errors='coerce')
+##Recebe um csv e classifica todas as transações
+dados = pd.read_csv("./dadosv3.csv", delimiter=';')
 
-#dados = dados[dados['DATA CAIXA'].dt.year == 2025]
+dados['DATA CAIXA'] = pd.to_datetime(dados['DATA CAIXA'], errors='coerce')
 
-#preencher_csv2(dados)
+dados = dados[dados['DATA CAIXA'].dt.year == 2025]
+
+preencher_csv(dados)
