@@ -5,8 +5,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
+import perfil
 
-caminho_csv = "./dadosv3.csv"
+caminho_csv = "./database/auto.csv"
 
 df = pd.read_csv(caminho_csv, delimiter=';')
 
@@ -79,7 +80,6 @@ print(classification_report(y_test_subcategoria, y_pred_subcategoria))
 
 #Realiza a classificação
 def classificacao(item):
-    from perfil import Item
  
     descricao_tfidf = tfidf_vectorizer.transform([item.get_name()])
 
@@ -91,39 +91,16 @@ def classificacao(item):
     item.set_category(categoria_pred[0])
     item.set_subcategory(subcategoria_pred[0])
 
-#é necessario??
-def apply_classifier(descricao):
-    pote, categoria, subcategoria = classificacao(descricao)
-    return pote, categoria, subcategoria
-
-#cria transacao ja classificada
-def add_transacao(data_competencia, data_caixa, valor, descricao, conta):
-    pote, categoria, subcategoria = apply_classifier(descricao)
-
-    transacao = pd.DataFrame({
-        'DATA COMPETÊNCIA': [data_competencia],
-        'DATA CAIXA': [data_caixa],
-        'DESCRIÇÃO': [descricao],
-        'VALOR': [valor],
-        'CONTA': [conta],
-        'POTE': [None],  # Coluna POTE vazia
-        'CATEGORIA': [None],  # Coluna CATEGORIA vazia
-        'SUBCATEGORIA': [None],  # Coluna SUBCATEGORIA vazia
-        'OBSERVAÇÃO': [None],  # Coluna OBSERVAÇÃO vazia
-    })
-
-    transacao['POTE'] = pote
-    transacao['CATEGORIA'] = categoria
-    transacao['SUBCATEGORIA'] = subcategoria
-
-    return transacao
+    return item.get_type(), item.get_category(), item.get_subcategory()
 
 #Preenche csv
 def preencher_csv_arquivo(caminho_csv):
+    pass
+    """
     df = pd.read_csv(caminho_csv)
 
     for i, row in df.iterrows():
-        pote, categoria, subcategoria = apply_classifier(row['DESCRIÇÃO'])
+        pote, categoria, subcategoria = classificacao(row['DESCRIÇÃO'])
 
         df.loc[i, 'POTE'] = pote
         df.loc[i, 'CATEGORIA'] = categoria
@@ -131,8 +108,9 @@ def preencher_csv_arquivo(caminho_csv):
 
     df.to_csv("./saida.csv", index=False)
     print("CSV preenchido com sucesso!")
-    
+    """
 def preencher_csv(df):
+    """"
     for i, row in df.iterrows():
         pote, categoria, subcategoria = apply_classifier(row['DESCRIÇÃO'])
 
@@ -141,18 +119,5 @@ def preencher_csv(df):
         df.loc[i, 'SUBCATEGORIA'] = subcategoria
 
     df.to_csv("./saida2.csv", index=False)
-    print("CSV preenchido com sucesso!")
-
-
-##Testando funções
-##Cria uma transação e a classifica automaticamente
-print(add_transacao('2025-03-20', '2025-03-20', 100.00, 'PIX HARMONIA LOCACOES', 'ITAU'))
-
-##Recebe um csv e classifica todas as transações
-dados = pd.read_csv("./dadosv3.csv", delimiter=';')
-
-dados['DATA CAIXA'] = pd.to_datetime(dados['DATA CAIXA'], errors='coerce')
-
-dados = dados[dados['DATA CAIXA'].dt.year == 2025]
-
-preencher_csv(dados)
+    print("CSV preenchido com sucesso!")"
+    """
