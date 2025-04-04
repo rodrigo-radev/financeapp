@@ -193,6 +193,7 @@ def exibir_graficos():
 
     # Criar seleção de categoria para análise detalhada
     from perfil import Dados
+    Dados = perfil.Dados()
     categorias_disponiveis = Dados.get_categorias_values()
     categoria_analisada = st.selectbox("📂 Escolha uma categoria para ver detalhes das subcategorias", ["Nenhuma"] + list(categorias_disponiveis))
 
