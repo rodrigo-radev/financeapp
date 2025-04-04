@@ -147,6 +147,31 @@ def exibir_graficos():
     df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].groupby('CATEGORIA')['VALOR'].sum().reset_index()
     df_gastos['VALOR'] = df_gastos['VALOR'].abs()  # Garante que os valores de gastos sejam positivos
     
+# Calcular resumo financeiro do mês
+    total_receitas = df_receitas['VALOR'].sum() if not df_receitas.empty else 0
+    total_gastos = df_gastos['VALOR'].sum() if not df_gastos.empty else 0
+    saldo = total_receitas - total_gastos
+
+    # Exibir resumo financeiro
+    st.subheader(f"Resumo Financeiro - {mes_selecionado}")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Receitas", f"R$ {total_receitas:,.2f}")
+    col2.metric("Total Gastos", f"R$ {total_gastos:,.2f}")
+    col3.metric("Saldo do Mês", f"R$ {saldo:,.2f}", delta=f"R$ {saldo:,.2f}")
+
+    # Exibir tabela com as categorias de maior receita e maior gasto
+    st.subheader("🏆 Top 5 Categorias com Maior Receita")
+    if not df_receitas.empty:
+        st.write(df_receitas.sort_values(by="VALOR", ascending=False).head(5))
+    else:
+        st.write("Nenhuma receita encontrada para este mês.")
+
+    st.subheader("💰 Top 5 Categorias com Maior Gasto")
+    if not df_gastos.empty:
+        st.write(df_gastos.sort_values(by="VALOR", ascending=False).head(5))
+    else:
+        st.write("Nenhum gasto encontrado para este mês.")
+    
     # Criar gráficos separados
     if not df_receitas.empty:
         fig_receitas = px.bar(df_receitas, x='CATEGORIA', y='VALOR', color='CATEGORIA',
@@ -163,5 +188,41 @@ def exibir_graficos():
         st.plotly_chart(fig_gastos)
     else:
         st.write("Nenhum gasto encontrado para este mês.")
+
+    st.header("🔎 Análise por Subcategoria")
+
+    # Criar seleção de categoria para análise detalhada
+    categorias_disponiveis = df['CATEGORIA'].unique()
+    categoria_analisada = st.selectbox("📂 Escolha uma categoria para ver detalhes das subcategorias", ["Nenhuma"] + list(categorias_disponiveis))
+
+    if categoria_analisada != "Nenhuma":
+        df_sub = df[df['CATEGORIA'] == categoria_analisada]
+
+        # Criar DataFrames separados para receitas e gastos por subcategoria
+        df_receitas_sub = df_sub[df_sub['Tipo'] == 'Receita'].groupby('SUBCATEGORIA')['VALOR'].sum().reset_index()
+        df_gastos_sub = df_sub[df_sub['Tipo'] == 'Gasto'].groupby('SUBCATEGORIA')['VALOR'].sum().reset_index()
+        df_gastos_sub['VALOR'] = df_gastos_sub['VALOR'].abs()  # Garante que os valores de gastos sejam positivos
+
+        # Criar gráfico de barras comparativo para as subcategorias
+        df_subcategorias = df_sub.groupby(['SUBCATEGORIA', 'Tipo'])['VALOR'].sum().reset_index()
+        if not df_subcategorias.empty:
+            fig_subcategorias = px.bar(df_subcategorias, x='SUBCATEGORIA', y='VALOR', color='Tipo', barmode='group',
+                                    title=f"📊 Receitas e Gastos por Subcategoria - {categoria_analisada}")
+            st.plotly_chart(fig_subcategorias)
+
+        # Criar gráficos de pizza para distribuição de receitas e gastos
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if not df_gastos_sub.empty:
+                fig_pizza_gastos = px.pie(df_gastos_sub, values='VALOR', names='SUBCATEGORIA',
+                                        title=f"💰 Gastos por Subcategoria - {categoria_analisada}", hole=0.4)
+                st.plotly_chart(fig_pizza_gastos)
+
+        with col2:
+            if not df_receitas_sub.empty:
+                fig_pizza_receitas = px.pie(df_receitas_sub, values='VALOR', names='SUBCATEGORIA',
+                                            title=f"📈 Receitas por Subcategoria - {categoria_analisada}", hole=0.4)
+                st.plotly_chart(fig_pizza_receitas)
 
     st.button("Voltar", on_click=voltar, key="voltar")
