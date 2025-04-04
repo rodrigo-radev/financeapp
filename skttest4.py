@@ -9,11 +9,10 @@ import perfil
 
 caminho_csv = "./database/auto.csv"
 
-df = pd.read_csv(caminho_csv, delimiter=';')
+df = pd.read_csv(caminho_csv)
 
-#df = df.dropna(subset=['DESCRIÇÃO', 'POTE', 'CATEGORIA', 'SUBCATEGORIA'])
-print(df.columns)
-print(df.head())
+df = df.dropna(subset=['DESCRIÇÃO', 'POTE', 'CATEGORIA', 'SUBCATEGORIA'])
+
 label_encoder_pote = LabelEncoder()
 df['POTE'] = label_encoder_pote.fit_transform(df['POTE'])
 
