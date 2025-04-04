@@ -121,7 +121,7 @@ def exibir_graficos():
     import perfil
 
     auto = perfil.Itens()
-    auto.from_csv("./database/export.csv")
+    auto.from_csv("./database/auto.csv")
     manual = perfil.Itens()
     manual.from_csv("./database/entrada_manual.csv")
 
