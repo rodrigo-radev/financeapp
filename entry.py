@@ -33,7 +33,7 @@ def upload_csv(conta):
         elif conta == 'MercadoPago':
             st.warning("Ainda não implementado")
         elif conta == 'NovoBanco':
-            lancamentos = bc.NovoBanco.csvread(upload_csv)
+            st.warning("Ainda não implementado")
         else:
             st.warning("Ainda não implementado")
     
