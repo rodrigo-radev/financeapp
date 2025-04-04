@@ -147,7 +147,7 @@ def exibir_graficos():
     df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].groupby('CATEGORIA')['VALOR'].sum().reset_index()
     df_gastos['VALOR'] = df_gastos['VALOR'].abs()  # Garante que os valores de gastos sejam positivos
     
-# Calcular resumo financeiro do mês
+    # Calcular resumo financeiro do mês
     total_receitas = df_receitas['VALOR'].sum() if not df_receitas.empty else 0
     total_gastos = df_gastos['VALOR'].sum() if not df_gastos.empty else 0
     saldo = total_receitas - total_gastos
