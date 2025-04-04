@@ -1,7 +1,6 @@
 streamlit
-pandas
-numpy
-csv
+pandas==2.2.1
+numpy==1.26.4
 nltk
 sklearn
 plotly
