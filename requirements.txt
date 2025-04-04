@@ -1,7 +1,6 @@
 streamlit
 pandas
 numpy
-json
 csv
 nltk
 sklearn
