@@ -6,4 +6,4 @@ json
 csv
 nltk
 sklearn
-plotly.express
+plotly
