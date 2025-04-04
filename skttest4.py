@@ -78,14 +78,18 @@ print("Avaliação Subcategoria: ")
 print(classification_report(y_test_subcategoria, y_pred_subcategoria))
 
 #Realiza a classificação
-def classificacao(descricao):
-    descricao_tfidf = tfidf_vectorizer.transform([descricao])
+def classificacao(item):
+    from perfil import Item
+ 
+    descricao_tfidf = tfidf_vectorizer.transform([item.get_name()])
 
     pote_pred = label_encoder_pote.inverse_transform(clf_pote.predict(descricao_tfidf))
     categoria_pred = label_encoder_categoria.inverse_transform(clf_categoria.predict(descricao_tfidf))
     subcategoria_pred = label_encoder_subcategoria.inverse_transform(clf_subcategoria.predict(descricao_tfidf))
 
-    return pote_pred[0], categoria_pred[0], subcategoria_pred[0]
+    item.set_type(pote_pred[0])
+    item.set_category(categoria_pred[0])
+    item.set_subcategory(subcategoria_pred[0])
 
 #é necessario??
 def apply_classifier(descricao):
