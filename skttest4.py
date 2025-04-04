@@ -12,7 +12,8 @@ caminho_csv = "./database/auto.csv"
 df = pd.read_csv(caminho_csv, delimiter=';')
 
 #df = df.dropna(subset=['DESCRIÇÃO', 'POTE', 'CATEGORIA', 'SUBCATEGORIA'])
-
+print(df.columns)
+print(df.head())
 label_encoder_pote = LabelEncoder()
 df['POTE'] = label_encoder_pote.fit_transform(df['POTE'])
 
