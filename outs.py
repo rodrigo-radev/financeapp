@@ -192,7 +192,8 @@ def exibir_graficos():
     st.header("🔎 Análise por Subcategoria")
 
     # Criar seleção de categoria para análise detalhada
-    categorias_disponiveis = df['CATEGORIA'].unique()
+    from perfil import Dados
+    categorias_disponiveis = Dados.get_categorias_values()
     categoria_analisada = st.selectbox("📂 Escolha uma categoria para ver detalhes das subcategorias", ["Nenhuma"] + list(categorias_disponiveis))
 
     if categoria_analisada != "Nenhuma":

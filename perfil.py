@@ -349,7 +349,25 @@ class Dados:
         
     def get_categorias(self):
         return self.categorias
+    
+    def get_pote_values(self):
+        return self.categorias.keys()
+
+    def get_categorias_values(self):
+        subcategorias = []
+        for categoria in self.categorias.values():
+            subcategorias.extend(categoria)
+        return subcategorias
+    
+    def get_subcategorias_values(self):
+        subcategorias = []
+        for categoria in self.categorias.values():
+            for subcategoria in categoria.values():
+                subcategorias.extend(subcategoria)
+        return subcategorias
+    
     def get_cartoes(self):
         return self.cartoes
+    
     def get_contas(self):
         return self.contas
