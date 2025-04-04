@@ -4,5 +4,5 @@ numpy==1.26.4
 nltk
 scikit-learn
 plotly
-openpyxl
-xrld
+openpyxl>=3.1.5
+xrld>=2.0.1
