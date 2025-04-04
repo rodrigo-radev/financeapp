@@ -1,4 +1,7 @@
 import pandas as pd
+class Banco_generico:
+    def output(self):
+        return "Ainda não implementado"
 class Itau:
     def xlsread(file_path):
         df = pd.read_excel(

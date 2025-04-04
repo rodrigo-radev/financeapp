@@ -226,14 +226,14 @@ class Itens:
         )
         
         lancamentos.rename(columns={
-        'DATA COMPETÊNCIA': 'DATA_COMPETÊNCIA',
-        'DATA CAIXA': 'DATA_CAIXA',
-        'VALOR': 'VALOR',
-        'DESCRIÇÃO': 'DESCRICAO',
-        'CONTA': 'CONTA',
-        'POTE': 'POTE',
-        'CATEGORIA': 'CATEGORIA',
-        'SUBCATEGORIA': 'SUBCATEGORIA'
+            'DATA COMPETÊNCIA': 'DATA_COMPETÊNCIA',
+            'DATA CAIXA': 'DATA_CAIXA',
+            'VALOR': 'VALOR',
+            'DESCRIÇÃO': 'DESCRICAO',
+            'CONTA': 'CONTA',
+            'POTE': 'POTE',
+            'CATEGORIA': 'CATEGORIA',
+            'SUBCATEGORIA': 'SUBCATEGORIA'
         }, inplace=True)
         
 

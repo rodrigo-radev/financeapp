@@ -13,11 +13,11 @@ def upload_pdf(conta):
         if conta == 'Itau':
             lancamentos = bc.Itau.pdfread(upload_pdf)
         elif conta == 'Bradesco':
-            pass
+            st.warning(bc.Banco_generico.output())
         elif conta == 'MercadoPago':
-            pass
+            st.warning(bc.Banco_generico.output())
         else:
-            pass
+            st.warning(bc.Banco_generico.output())
 
 def upload_csv(conta):
     st.title("Upload CSV")
@@ -31,13 +31,13 @@ def upload_csv(conta):
                 item.set_account(conta)
                 item.set_date(i['Data'])
         elif conta == 'Bradesco':
-            pass
+            st.warning(bc.Banco_generico.output())
         elif conta == 'MercadoPago':
-            pass
+            st.warning(bc.Banco_generico.output())
         elif conta == 'NovoBanco':
             lancamentos = bc.NovoBanco.csvread(upload_csv)
         else:
-            pass
+            st.warning(bc.Banco_generico.output())
     
     st.button("Voltar", on_click=o.voltar,key="voltar")
 
@@ -56,11 +56,11 @@ def upload_xls(conta):
             lancamento = pf.Itens()
             processado = lancamento.add_lancamento(lancamentos,conta)
         elif conta == 'BRADESCO':
-            pass
+            st.warning(bc.Banco_generico.output())
         elif conta == 'CC MercadoPago':
-            pass
+            st.warning(bc.Banco_generico.output())
         else:
-            pass
+            st.warning(bc.Banco_generico.output())
 
     if processado:          
         if st.button("Salvar"):

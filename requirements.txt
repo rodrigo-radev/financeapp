@@ -1,6 +1,9 @@
 streamlit
-pandas==2.2.1
-numpy==1.26.4
+pandas
+numpy
+csv
 nltk
-scikit-learn
+sklearn
 plotly
+openpyxl
+xrld
