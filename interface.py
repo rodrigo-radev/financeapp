@@ -2,7 +2,6 @@ import streamlit as st
 import entry as e
 import outs as o
 import perfil
-from streamlit_option_menu import option_menu
 perfil = perfil.Dados()
 contas = list(perfil.get_cartoes())
 contas.extend(perfil.get_contas())
