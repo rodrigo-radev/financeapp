@@ -351,7 +351,7 @@ class Dados:
         return self.categorias
     
     def get_pote_values(self):
-        return self.categorias.keys()
+        return list(self.categorias.keys())
 
     def get_categorias_values(self):
         subcategorias = []

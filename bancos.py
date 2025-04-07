@@ -8,7 +8,7 @@ class Itau:
     def xlsread(file_path):
         df = pd.read_excel(
             file_path,
-            engine='xlrd',
+            #engine='xlrd',
             sheet_name="Lançamentos",
             skiprows=9,  # Skip
             usecols="A:E",

@@ -175,3 +175,5 @@ cython_debug/
 database/FUNDORAFAEL.xlsx
 __pycache__/entry.cpython-313.pyc
 tester.py
+fatura.pdf
+fatura.txt
