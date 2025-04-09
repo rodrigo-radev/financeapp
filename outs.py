@@ -145,12 +145,14 @@ def exibir_graficos():
     df['Tipo'] = df['VALOR'].apply(lambda x: 'Receita' if x > 0 else 'Gasto')  # Define tipo de transação
 
 
-    # Criar seleção de mês
-    meses_disponiveis = df['Mês/Ano'].unique()
-    mes_selecionado = st.selectbox("Selecione o mês", sorted(meses_disponiveis, reverse=True),index=16)
-    
-    # Filtrar pelo mês selecionado
-    df_filtrado = df[df['Mês/Ano'] == mes_selecionado]
+    meses_disponiveis = sorted(df['Mês/Ano'].unique(), reverse=True)
+    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[:1])
+
+    if not meses_selecionados:
+        st.warning("Selecione ao menos um mês para visualizar os dados.")
+        return
+
+    df_filtrado = df[df['Mês/Ano'].isin(meses_selecionados)]
     
     # Criar DataFrames separados para receitas e gastos
     df_receitas = df_filtrado[df_filtrado['Tipo'] == 'Receita'].groupby('CATEGORIA')['VALOR'].sum().reset_index()
@@ -163,7 +165,7 @@ def exibir_graficos():
     saldo = total_receitas - total_gastos
 
     # Exibir resumo financeiro
-    st.subheader(f"Resumo Financeiro - {mes_selecionado}")
+    st.subheader(f"Resumo Financeiro - {meses_selecionados}")
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Receitas", f"R$ {total_receitas:,.2f}")
     col2.metric("Total Gastos", f"R$ {total_gastos:,.2f}")
@@ -185,7 +187,7 @@ def exibir_graficos():
     # Criar gráficos separados
     if not df_receitas.empty:
         fig_receitas = px.bar(df_receitas, x='CATEGORIA', y='VALOR', color='CATEGORIA',
-                              title=f'Receitas por Categoria - {mes_selecionado}',
+                              title=f'Receitas por Categoria - {meses_selecionados}',
                               labels={'VALOR': 'Valor (R$)', 'CATEGORIA': 'Categoria'})
         st.plotly_chart(fig_receitas)
     else:
@@ -193,7 +195,7 @@ def exibir_graficos():
     
     if not df_gastos.empty:
         fig_gastos = px.bar(df_gastos, x='CATEGORIA', y='VALOR', color='CATEGORIA',
-                            title=f'Gastos por Categoria - {mes_selecionado}',
+                            title=f'Gastos por Categoria - {meses_selecionados}',
                             labels={'VALOR': 'Valor (R$)', 'CATEGORIA': 'Categoria'})
         st.plotly_chart(fig_gastos)
     else:
