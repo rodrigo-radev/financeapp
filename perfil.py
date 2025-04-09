@@ -299,19 +299,20 @@ class Dados:
     def __init__(self):
         self.categorias = {
             "Despesas Básicas": {
-                "Alimentação": ["Mercado", "Restaurante", "Lanches", "Padaria", "Suplementação"],
+                "Alimentação": ["Mercado", "Restaurante", "Lanches", "Suplementação"],
                 "Assinaturas": ["Telefone", "Fotos", "Stream"],
+                "Despesas Bancarias": ["Jutor e IOF", "Taxas"],
                 "Transporte": ["Aplicativo", "Carro manutenção", "Carro melhorias", "Estacionamento", "Combustível"],
-                "Casa": ["Diarista Alimentação", "Diarista Limpeza", "Água e Luz", "Jardineiro", "Manutenção Casa", "Material de limpeza"],
+                "Casa": ["Diarista Alimentação", "Diarista Limpeza", "Água", "Luz", "Jardineiro", "Manutenção Casa", "Material de limpeza"],
                 "Cuidado pessoal": ["Academia", "Cabeleireiro", "Estética", "Saúde"],
                 "Vestuário": ["Roupas", "Calçados", "Acessórios"],
                 "Seguro": ["Carro", "Vida", "Residencial"],
                 "Esporte": ["Academia", "Equipamento"],
-                "Férias": ["Passagem", "Hospedagem", "Alimentação", "Passeios"],
+                "Férias": ["Passagem", "Hospedagem", "Alimentação", "Passeios", "Presentes"]
             },
             "Despesas Profissionais": {
-                "Taxa": ["Banco", "Plataforma"],
-                "Gestor": ["Gestão"],
+                "Taxa": ["Banco", "Plataforma","Corretor"],
+                "Gestor": ["Dennis"],
                 "Estagiario": ["Estágio"],
                 "Projetos": ["Projeto1", "Projeto2", "Projeto3"]
             },
@@ -320,21 +321,31 @@ class Dados:
                 "UDV": ["Dízimo"]
             },
             "Investimento": {
-                "Bens Materias": ["Equipamento"],
-                "Férias": ["Passagem", "Hospedagem", "Alimentação", "Passeios"],
-                "Casa": ["Aluguel", "Condomínio", "Água", "Luz", "Gás", "Telefone", "Internet"],
+                "Bens Materias": ["Equipamento","Eletrônicos"],
+                "Férias": ["Fundo Férias"],
+                "Casa": ["Fundo Casa"],
                 "Kite": ["Material"],
                 "Escritório": ["Material"]
             },
             "Emprestimos": {
-                "Bloqueio Judicial": ["Bloqueio Judicial"], 
-                "Financeamento":["Financeamento"], 
-                "Juros":["Juros"], 
+                "Bloqueio de conta": ["Bloqueio Judicial"], 
+                "Capital de giro": ["Mercedes","TonTon"],
+                "Financeamento":["Parcelamento Compass", "Parcelamento Mercedes"], 
+                "Juros":["Conta Corrente", "Cartão de Credito"], 
                 "Fundo Abreu":["Fundo Abreu"], 
                 "Ingrid":["Ingrid"], 
                 "Terceiros":["Terceiros"], 
                 "Encontro de contas":["Encontro de contas"], 
                 "Saque":["Saque"]
+            },
+            "Receitas": {
+                "Salário": ["Bonor"],
+                "Dharma": ["Showme"],
+                "AirBnB": ["AirBnB"],
+                "Harmonia": ["RAMall"]
+            },
+            "Entrada": {
+                "Aluguel": ["Harmonia"]
             },
             None:{
                 None:[None]
