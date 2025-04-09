@@ -68,8 +68,10 @@ def upload_xls(conta):
             #Após salvar limpar a lista de gastos
             lancamento.reset()
             st.success(f"Gastos salvos em {json_file_path}")
-            
-        o.export_excel()
+        
+        file = './database/lancamento.csv'
+        to_file = './database/novoexport.xlsx'
+        o.export_excel(file,to_file)
         
     st.button("Voltar", on_click=o.voltar,key="voltar")
 
@@ -162,9 +164,8 @@ def manual_entry():
     with coluna3:
         if st.button("Exportar",key='exportar'):
             file = './database/entrada_manual.csv'
-            import pandas as pd
-            expo = pd.read_csv(file)
-            expo.to_excel('database/novoexport.xlsx')
-            st.success("Arquivo exportado")
+            to_file = 'database/novoexport.xlsx'
+
+            o.export_excel(file,to_file)
 
     st.button("Voltar", on_click=o.voltar,key="voltar")
