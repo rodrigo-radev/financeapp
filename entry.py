@@ -68,7 +68,9 @@ def upload_xls(conta):
             #Após salvar limpar a lista de gastos
             lancamento.reset()
             st.success(f"Gastos salvos em {json_file_path}")
-
+            
+        o.export_excel()
+        
     st.button("Voltar", on_click=o.voltar,key="voltar")
 
 def manual_entry():

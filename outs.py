@@ -114,6 +114,17 @@ def classificar_itens(itens):
         df = pd.read_json(df)
         st.write(df)
 
+def export_excel():
+    if st.button("Exportar",key='exportar'):
+            file = './database/lancamento.csv'
+
+            expo = pd.read_csv(file)
+            expo.to_excel('database/novoexport.xlsx')
+            st.success("Arquivo exportado")
+
+            with open('database/novoexport.xlsx', 'rb') as f:
+                st.download_button(label="Download",data=f,file_name='export_lancamento.xlsx',mime='xlsx')
+
 def exibir_graficos():
     import plotly.express as px
     st.title("Gráficos")
