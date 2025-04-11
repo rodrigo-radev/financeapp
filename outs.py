@@ -144,7 +144,13 @@ def exibir_graficos():
     df = pd.DataFrame.from_dict(unificado.to_dict())
     df['VALOR'] = pd.to_numeric(df['VALOR'])
     df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'], dayfirst=True)
-    df['Mês/Ano'] = df['DATA CAIXA'].dt.strftime('%Y-%m')
+    df['DATA COMPETÊNCIA'] = pd.to_datetime(df['DATA COMPETÊNCIA'], dayfirst=True)
+
+    # Selecionar tipo de data para análise
+    tipo_data = st.radio("📆 Escolha a data para análise:", ["Data Caixa", "Data Competência"])
+    coluna_data = 'DATA CAIXA' if tipo_data == "Data Caixa" else 'DATA COMPÊTENCIA'
+
+    df['Mês/Ano'] = df[coluna_data].dt.strftime('%Y-%m')
     df['Tipo'] = df['VALOR'].apply(lambda x: 'Receita' if x > 0 else 'Gasto')
 
     # Filtro por mês
@@ -240,5 +246,35 @@ def exibir_graficos():
                 fig_pizza_receitas = px.pie(df_receitas_sub, values='VALOR', names='SUBCATEGORIA',
                                             title=f"📈 Receitas por Subcategoria - {categoria_analisada}", hole=0.4)
                 st.plotly_chart(fig_pizza_receitas)
+
+        # Análise histórica da subcategoria
+    st.header("📅 Tendência da Subcategoria ao longo do tempo")
+
+    if categoria_analisada != "Nenhuma":
+        subcategorias_disponiveis = df[df['CATEGORIA'] == categoria_analisada]['SUBCATEGORIA'].unique()
+        subcategoria_analisada = st.selectbox("📌 Escolha uma subcategoria para ver a tendência", ["Nenhuma"] + sorted(subcategorias_disponiveis))
+
+        if subcategoria_analisada != "Nenhuma":
+            # Pega o mês mais recente selecionado
+            ultimo_mes = max(meses_selecionados)
+
+            # Converte para datetime
+            data_ultima = pd.to_datetime(ultimo_mes + "-01")
+            meses_retroativos = [(data_ultima - pd.DateOffset(months=i)).strftime('%Y-%m') for i in range(5, -1, -1)]
+
+            df_sub_hist = df[
+                (df['CATEGORIA'] == categoria_analisada) &
+                (df['SUBCATEGORIA'] == subcategoria_analisada) &
+                (df['Mês/Ano'].isin(meses_retroativos)) &
+                (df['Tipo'] == 'Gasto')
+            ].groupby('Mês/Ano')['VALOR'].sum().reindex(meses_retroativos, fill_value=0).reset_index()
+
+            df_sub_hist['VALOR'] = df_sub_hist['VALOR'].abs()
+
+            fig_sub_hist = px.bar(df_sub_hist, x='Mês/Ano', y='VALOR',
+                                  title=f"📊 Gastos com '{subcategoria_analisada}' nos últimos 6 meses",
+                                  labels={'VALOR': 'Valor (R$)', 'Mês/Ano': 'Mês'},
+                                  color_discrete_sequence=["#EF553B"])
+            st.plotly_chart(fig_sub_hist, use_container_width=True)
 
     st.button("Voltar", on_click=voltar, key="voltar")
