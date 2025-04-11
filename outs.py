@@ -148,7 +148,7 @@ def exibir_graficos():
 
     # Selecionar tipo de data para análise
     tipo_data = st.radio("📆 Escolha a data para análise:", ["Data Caixa", "Data Competência"])
-    coluna_data = 'DATA CAIXA' if tipo_data == "Data Caixa" else 'DATA COMPÊTENCIA'
+    coluna_data = 'DATA CAIXA' if tipo_data == "Data Caixa" else 'DATA COMPETÊNCIA'
 
     df['Mês/Ano'] = df[coluna_data].dt.strftime('%Y-%m')
     df['Tipo'] = df['VALOR'].apply(lambda x: 'Receita' if x > 0 else 'Gasto')
