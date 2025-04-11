@@ -280,6 +280,7 @@ class Itens:
     def reset(self):
         self.itens.clear()
         self.itens = []
+        return self.itens
 
     def add_lancamento(self,lancamentos,conta):
                 item = Item()
