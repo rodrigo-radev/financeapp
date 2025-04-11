@@ -210,7 +210,7 @@ def exibir_graficos():
     categoria_analisada = st.selectbox("📂 Escolha uma categoria para ver detalhes das subcategorias", ["Nenhuma"] + list(categorias_disponiveis))
 
     if categoria_analisada != "Nenhuma":
-        df_sub = df[df['CATEGORIA'] == categoria_analisada]
+        df_sub = df_filtrado[df_filtrado['CATEGORIA'] == categoria_analisada]
 
         # Criar DataFrames separados para receitas e gastos por subcategoria
         df_receitas_sub = df_sub[df_sub['Tipo'] == 'Receita'].groupby('SUBCATEGORIA')['VALOR'].sum().reset_index()
