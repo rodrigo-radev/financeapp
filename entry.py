@@ -62,8 +62,8 @@ def upload_xls(conta):
 
     if processado:          
         if st.button("Salvar"):
-            json_file_path = "./database/auto.csv"
-            o.to_csv(lancamento,json_file_path)
+            json_file_path = "./database/lancamento.csv"
+            o.to_csv(lancamento,json_file_path,True)
             
             #Após salvar limpar a lista de gastos
             lancamento.reset()

@@ -1,14 +1,17 @@
 import streamlit as st
 import entry as e
 import outs as o
-import perfil
-perfil = perfil.Dados()
+import perfil as pf
+
+perfil = pf.Dados()
+
 contas = list(perfil.get_cartoes())
 contas.extend(perfil.get_contas())
 
 # Funções para cada página
 def home():
     st.title("MVP - Extrato Bancário")
+
     
     #botões em colunas para escolha de entrada de dados
     col1, col2, col3= st.columns(3)
@@ -22,6 +25,9 @@ def home():
     with col2:
         if st.button("Entrada manual"):
             st.session_state.page = "manual_entry"
+        if st.button("Incorporar dados"):
+            st.session_state['auto'] = pf.Itens()
+            st.session_state['auto'].gerar_auto()
     with col3:
         if st.button("Exibir gráficos"):
             st.session_state.page = "graficos"

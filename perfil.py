@@ -100,6 +100,11 @@ class Item:
         self.parcelas = data['PARCELAS']
         self.n_parcelas = data['N PARCELA']
 
+    def __eq__(self, value):
+        if isinstance(value, Item):
+            return self.name == value.name and self.price == value.price and self.type == value.type and self.category == value.category and self.subcategory == value.subcategory and self.date == value.date and self.date_payment == value.date_payment and self.account == value.account
+        return False
+
     def from_json(self, data):
         self.from_dict(json.loads(data))
 
@@ -157,6 +162,11 @@ class Item:
 class Itens:
     def __init__(self):
         self.itens = []
+
+    def __eq__(self, value):
+        if isinstance(value, Itens):
+            return self.itens == value.itens
+        return False
     
     def add(self, item):
         self.itens.append(item)
@@ -282,6 +292,12 @@ class Itens:
         self.itens = []
         return self.itens
 
+    def empty(self):
+        if len(self.itens) == 0:
+            return True
+        else:
+            return False
+
     def add_lancamento(self,lancamentos,conta):
                 item = Item()
                 for row in lancamentos.itertuples():
@@ -296,6 +312,33 @@ class Itens:
                         item.set_price(row.valor)
                         self.add(item.to_dict())
                 return True
+    
+    def gerar_auto(self):
+        df = Itens()
+        auto = Itens()
+
+        df.from_csv('./database/lancamento.csv')
+        auto.from_csv('./database/auto.csv')
+
+        repetido = False
+        #Testa se já existe um item com o mesmo nome e valor
+        if not(auto.empty()):
+            for i in range(len(df)):
+                try:
+                    for j in range(len(auto)):
+                        if df.get(i) == auto.get(j):
+                            repetido = True
+                            break
+                except Exception as e:
+                    print("Erro ao comparar os itens. Erro: ",e,"\n")
+                    repetido = True
+                    break
+        if repetido:
+            return
+        
+        import outs as o
+        o.to_csv(df.to_dict(), './database/auto.csv')
+
 class Dados:
     def __init__(self):
         self.categorias = {

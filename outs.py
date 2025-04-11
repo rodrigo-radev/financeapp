@@ -124,6 +124,25 @@ def export_excel(file,to_file):
             with open(to_file, 'rb') as f:
                 st.download_button(label="Download",data=f,file_name='export_lancamento.xlsx',mime='xlsx')
 
+def incorporar():
+    import perfil
+    auto = perfil.Itens()
+    manual = perfil.Itens()
+
+    try:
+        auto.from_csv("./database/auto.csv")
+        manual.from_csv("./database/entrada_manual.csv")
+    except Exception as e:
+        print(e,"\n")
+
+    unificado = unificar(auto,manual)
+
+    # Salvar o CSV gerado em um arquivo
+    try:
+        to_csv(unificado.to_dict(),"./database/export.csv")
+    except Exception as e:
+        print(e,"\n")
+
 def exibir_graficos():
     import plotly.express as px
     import streamlit as st
