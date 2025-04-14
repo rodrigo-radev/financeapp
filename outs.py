@@ -170,6 +170,8 @@ def exibir_graficos():
     # Agrupar receitas e gastos
     df_receitas = df_filtrado[df_filtrado['Tipo'] == 'Receita'].groupby(coluna_slct)['VALOR'].sum().reset_index()
     df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].groupby(coluna_slct)['VALOR'].sum().reset_index()
+
+    #aLERT
     df_gastos['VALOR'] = df_gastos['VALOR'].abs()
 
     # Resumo financeiro
@@ -182,6 +184,17 @@ def exibir_graficos():
     col1.metric("Total Receitas", f"R$ {total_receitas:,.2f}")
     col2.metric("Total Gastos", f"R$ {total_gastos:,.2f}")
     col3.metric("Saldo do Mês", f"R$ {saldo:,.2f}", delta=f"R$ {saldo:,.2f}")
+
+    # Cálculo do saldo total acumulado (toda a base)
+    total_receitas_geral = df[df['Tipo'] == 'Receita']['VALOR'].sum()
+    total_gastos_geral = df[df['Tipo'] == 'Gasto']['VALOR'].abs().sum()
+    saldo_total = total_receitas_geral - total_gastos_geral
+
+    st.subheader("📊 Visão Geral Acumulada")
+    col4, col5, col6 = st.columns(3)
+    col4.metric("Receitas Totais", f"R$ {total_receitas_geral:,.2f}")
+    col5.metric("Gastos Totais", f"R$ {total_gastos_geral:,.2f}")
+    col6.metric("Saldo Geral", f"R$ {saldo_total:,.2f}")
 
     # Tabelas com Top 5
     st.subheader("🏆 Top 5 com Maior Receita")
