@@ -365,7 +365,7 @@ def analise_contas():
     cartoes_disponiveis = faturas_cartoes['Cartão'].unique()
 
     cartao_selecionado = st.selectbox(
-        "📌 Selecione um cartão para visualizar faturas (3 meses antes e depois)", 
+        "📌 Selecione um cartão para visualizar faturas", 
         options=["Nenhum"] + list(cartoes_disponiveis)
     )
 
@@ -395,7 +395,37 @@ def analise_contas():
                     color_discrete_sequence=["#636EFA"])
         st.plotly_chart(fig, use_container_width=True)
 
-        st.button("Voltar", on_click=voltar, key="voltar")
+        st.subheader(f"📊 Detalhamento por Categoria - {cartao_selecionado} ({ultimo_mes})")
+        # Filtrar apenas o mês base (o último mês selecionado)
+        df_cartao_mes = df[
+            (df['CONTA'] == cartao_selecionado) &
+            (df['Mês/Ano'] == ultimo_mes)
+        ]
+
+        if not df_cartao_mes.empty:
+            # Criar coluna "Tipo Cartão" para identificar gasto ou estorno
+            df_cartao_mes['Tipo Cartão'] = df_cartao_mes['VALOR'].apply(lambda x: 'Gasto' if x < 0 else 'Estorno')
+            df_cartao_mes['VALOR_ABS'] = df_cartao_mes['VALOR'].abs()
+
+            # Agrupar por categoria e tipo (gasto ou estorno)
+            df_cat_tipo = df_cartao_mes.groupby(['CATEGORIA', 'Tipo Cartão'])['VALOR_ABS'].sum().reset_index()
+
+            # Gráfico de barras agrupadas
+            fig_cat = px.bar(
+                df_cat_tipo,
+                x='CATEGORIA',
+                y='VALOR_ABS',
+                color='Tipo Cartão',
+                barmode='group',
+                title=f"🧾 Gastos e Estornos por Categoria - {ultimo_mes}",
+                labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'}
+            )
+            st.plotly_chart(fig_cat, use_container_width=True)
+        else:
+            st.write("Nenhum gasto ou estorno encontrado para esse cartão no mês selecionado.")
+
+    st.button("Voltar", on_click=voltar, key="voltar")
+
 
 
 
