@@ -334,7 +334,7 @@ def analise_contas():
 
     # Filtro por mês
     meses_disponiveis = sorted(df['Mês/Ano'].unique(), reverse=True)
-    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[:1])
+    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[17])
 
     if not meses_selecionados:
         st.warning("Selecione ao menos um mês para visualizar os dados.")
