@@ -124,25 +124,6 @@ def export_excel(file,to_file):
             with open(to_file, 'rb') as f:
                 st.download_button(label="Download",data=f,file_name='export_lancamento.xlsx',mime='xlsx')
 
-def incorporar():
-    import perfil
-    auto = perfil.Itens()
-    manual = perfil.Itens()
-
-    try:
-        auto.from_csv("./database/auto.csv")
-        manual.from_csv("./database/entrada_manual.csv")
-    except Exception as e:
-        print(e,"\n")
-
-    unificado = unificar(auto,manual)
-
-    # Salvar o CSV gerado em um arquivo
-    try:
-        to_csv(unificado.to_dict(),"./database/export.csv")
-    except Exception as e:
-        print(e,"\n")
-
 def exibir_graficos():
     import plotly.express as px
     import streamlit as st
@@ -208,6 +189,20 @@ def exibir_graficos():
     total_receitas_geral = df[df['Tipo'] == 'Receita']['VALOR'].sum()
     total_gastos_geral = df[df['Tipo'] == 'Gasto']['VALOR'].abs().sum()
     saldo_total = total_receitas_geral - total_gastos_geral
+
+    st.subheader("🏦 Saldo Acumulado por Conta")
+
+    saldo_contas = df.groupby('CONTA')['VALOR'].sum().reset_index()
+    saldo_contas = saldo_contas.sort_values(by='VALOR', ascending=False)
+
+    st.dataframe(saldo_contas, use_container_width=True)
+
+    st.subheader(f"💳 Totais por Conta no(s) mês(es) selecionado(s): {', '.join(meses_selecionados)}")
+
+    totais_contas_mes = df_filtrado.groupby('CONTA')['VALOR'].sum().reset_index()
+    totais_contas_mes = totais_contas_mes.sort_values(by='VALOR', ascending=False)
+
+    st.dataframe(totais_contas_mes, use_container_width=True)
 
     st.subheader("📊 Visão Geral Acumulada")
     col4, col5, col6 = st.columns(3)
@@ -310,3 +305,100 @@ def exibir_graficos():
             st.plotly_chart(fig_sub_hist, use_container_width=True)
 
     st.button("Voltar", on_click=voltar, key="voltar")
+
+def analise_contas():
+    import plotly.express as px
+    import streamlit as st
+    import pandas as pd
+    import perfil
+
+    auto = perfil.Itens()
+    auto.from_csv("./database/export.csv")
+    manual = perfil.Itens()
+    manual.from_csv("./database/entrada_manual.csv")
+
+    unificado = unificar(auto, manual)
+
+    # Converter para DataFrame
+    df = pd.DataFrame.from_dict(unificado.to_dict())
+    df['VALOR'] = pd.to_numeric(df['VALOR'])
+    df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'], dayfirst=True)
+    df['DATA COMPETÊNCIA'] = pd.to_datetime(df['DATA COMPETÊNCIA'], dayfirst=True)
+
+    # Selecionar tipo de data para análise
+    tipo_data = st.radio("📆 Escolha a data para análise:", ["Data Caixa", "Data Competência"])
+    coluna_data = 'DATA CAIXA' if tipo_data == "Data Caixa" else 'DATA COMPETÊNCIA'
+
+    df['Mês/Ano'] = df[coluna_data].dt.strftime('%Y-%m')
+    df['Tipo'] = df['VALOR'].apply(lambda x: 'Receita' if x > 0 else 'Gasto')
+
+    # Filtro por mês
+    meses_disponiveis = sorted(df['Mês/Ano'].unique(), reverse=True)
+    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[:1])
+
+    if not meses_selecionados:
+        st.warning("Selecione ao menos um mês para visualizar os dados.")
+        return
+
+    df_filtrado = df[df['Mês/Ano'].isin(meses_selecionados)]
+
+    # 💳 Faturas de Cartões de Crédito no(s) mês(es) selecionado(s)
+    st.subheader("💳 Faturas de Cartões de Crédito no(s) mês(es) selecionado(s)")
+
+    # Filtrar apenas as contas que começam com "CC" (Cartão de Crédito)
+    df_cartoes = df_filtrado[
+        (df_filtrado['CONTA'].str.startswith("CC")) &
+        (df_filtrado['Tipo'] == 'Gasto')
+    ]
+
+    # Agrupar por conta e somar os gastos
+    faturas_cartoes = df_cartoes.groupby('CONTA')['VALOR'].sum().abs().reset_index()
+    faturas_cartoes.columns = ['Cartão', 'Total da Fatura']
+
+    # Exibir como tabela
+    if not faturas_cartoes.empty:
+        st.dataframe(faturas_cartoes.sort_values(by='Total da Fatura', ascending=False), use_container_width=True)
+    else:
+        st.write("Nenhuma fatura de cartão encontrada para o(s) mês(es) selecionado(s).")
+
+    # Cartões disponíveis no mês filtrado
+    cartoes_disponiveis = faturas_cartoes['Cartão'].unique()
+
+    cartao_selecionado = st.selectbox(
+        "📌 Selecione um cartão para visualizar faturas (3 meses antes e depois)", 
+        options=["Nenhum"] + list(cartoes_disponiveis)
+    )
+
+    if cartao_selecionado != "Nenhum":
+        # Pega o último mês selecionado
+        ultimo_mes = max(meses_selecionados)
+
+        # Transforma em datetime
+        data_base = pd.to_datetime(ultimo_mes + "-01")
+
+        # Gera a lista de 7 meses: 3 anteriores, o atual e 3 posteriores
+        meses_analise = [(data_base + pd.DateOffset(months=i)).strftime('%Y-%m') for i in range(-3, 4)]
+
+        # Filtrar os dados do cartão para esses meses
+        df_cartao_periodo = df[
+            (df['CONTA'] == cartao_selecionado) &
+            (df['Mês/Ano'].isin(meses_analise)) &
+            (df['Tipo'] == 'Gasto')
+        ].groupby('Mês/Ano')['VALOR'].sum().abs().reindex(meses_analise, fill_value=0).reset_index()
+
+        df_cartao_periodo.columns = ['Mês/Ano', 'Fatura']
+
+        # Exibir gráfico
+        fig = px.bar(df_cartao_periodo, x='Mês/Ano', y='Fatura',
+                    title=f"📈 Evolução das Faturas - {cartao_selecionado}",
+                    labels={'Fatura': 'Valor (R$)', 'Mês/Ano': 'Mês'},
+                    color_discrete_sequence=["#636EFA"])
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.button("Voltar", on_click=voltar, key="voltar")
+
+
+
+    
+
+
