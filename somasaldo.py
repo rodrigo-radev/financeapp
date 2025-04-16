@@ -1,15 +1,11 @@
 import pandas as pd
 
 df = pd.read_csv("database/export.csv")
+df['VALOR'] = pd.to_numeric(df['VALOR'])
+df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'], dayfirst=True)
+df['DATA COMPETÊNCIA'] = pd.to_datetime(df['DATA COMPETÊNCIA'], dayfirst=True)
 
-somageral = df['VALOR'].sum()
-print(somageral)
+itau_black = df[df['CONTA'] == "CC ITAU BLACK"]
+itau_black = itau_black[itau_black['DATA CAIXA'] == pd.to_datetime("17/04/2025", dayfirst=True)]
 
-receitas = df[df['VALOR'] >= 0]
-gastos = df[df['VALOR'] < 0]
-
-receitas_sum = receitas['VALOR'].sum()
-gastos_sum = gastos['VALOR'].sum()
-
-print(receitas_sum)
-print(gastos_sum)
+print(itau_black['VALOR'].sum())
