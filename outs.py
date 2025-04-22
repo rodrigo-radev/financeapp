@@ -347,8 +347,7 @@ def analise_contas():
 
     # Filtrar apenas as contas que começam com "CC" (Cartão de Crédito)
     df_cartoes = df_filtrado[
-        (df_filtrado['CONTA'].str.startswith("CC")) &
-        (df_filtrado['Tipo'] == 'Gasto')
+        (df_filtrado['CONTA'].str.startswith("CC"))
     ]
 
     # Agrupar por conta e somar os gastos
@@ -382,8 +381,7 @@ def analise_contas():
         # Filtrar os dados do cartão para esses meses
         df_cartao_periodo = df[
             (df['CONTA'] == cartao_selecionado) &
-            (df['Mês/Ano'].isin(meses_analise)) &
-            (df['Tipo'] == 'Gasto')
+            (df['Mês/Ano'].isin(meses_analise))
         ].groupby('Mês/Ano')['VALOR'].sum().abs().reindex(meses_analise, fill_value=0).reset_index()
 
         df_cartao_periodo.columns = ['Mês/Ano', 'Fatura']
