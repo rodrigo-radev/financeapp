@@ -133,15 +133,7 @@ def exibir_graficos():
     st.title("Gráficos")
     st.write("Aqui você pode visualizar gráficos da base de dados.")
 
-    auto = perfil.Itens()
-    auto.from_csv("./database/export.csv")
-    manual = perfil.Itens()
-    manual.from_csv("./database/entrada_manual.csv")
-
-    unificado = unificar(auto, manual)
-
-    # Converter para DataFrame
-    df = pd.DataFrame.from_dict(unificado.to_dict())
+    df = pd.read_csv("database/export.csv")
     df['VALOR'] = pd.to_numeric(df['VALOR'])
     df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'], dayfirst=True)
     df['DATA COMPETÊNCIA'] = pd.to_datetime(df['DATA COMPETÊNCIA'], dayfirst=True)
@@ -312,15 +304,7 @@ def analise_contas():
     import pandas as pd
     import perfil
 
-    auto = perfil.Itens()
-    auto.from_csv("./database/export.csv")
-    manual = perfil.Itens()
-    manual.from_csv("./database/entrada_manual.csv")
-
-    unificado = unificar(auto, manual)
-
-    # Converter para DataFrame
-    df = pd.DataFrame.from_dict(unificado.to_dict())
+    df = pd.read_csv("database/export.csv")
     df['VALOR'] = pd.to_numeric(df['VALOR'])
     df['DATA CAIXA'] = pd.to_datetime(df['DATA CAIXA'], dayfirst=True)
     df['DATA COMPETÊNCIA'] = pd.to_datetime(df['DATA COMPETÊNCIA'], dayfirst=True)
