@@ -102,7 +102,7 @@ class Item:
 
     def __eq__(self, value):
         if isinstance(value, Item):
-            return self.name == value.name and self.price == value.price and self.type == value.type and self.category == value.category and self.subcategory == value.subcategory and self.date == value.date and self.date_payment == value.date_payment and self.account == value.account
+            return (self.name == value.get_name() and self.price == value.get_price() and self.type == value.get_type() and self.category == value.get_category() and self.subcategory == value.get_subcategory() and self.date == value.get_date() and self.date_payment == value.get_date_payment() and self.account == value.get_account())
         return False
 
     def from_json(self, data):
