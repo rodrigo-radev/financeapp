@@ -177,10 +177,17 @@ class Itens:
     def get(self, index):
         return self.itens[index]
     
+    def get_by_name(self, name):
+        for item in self.itens:
+            if item.get_name() == name:
+                return item
+        return None
+
     def get_all(self):
         return self.itens
     
     def clear(self):
+        self.itens.clear()
         self.itens = []
     
     def to_dict(self):
@@ -344,21 +351,33 @@ class Dados:
         self.categorias = {
             "Despesas Básicas": {
                 "Alimentação": ["Mercado", "Restaurante", "Lanches", "Suplementação"],
-                "Assinaturas": ["Telefone", "Fotos", "Stream"],
-                "Despesas Bancarias": ["Jutor e IOF", "Taxas"],
+                "Assinaturas": ["Telefone", "Icloud", "Stream"],
+                "Despesas Bancarias": ["Juros e IOF", "Taxas"],
                 "Transporte": ["Aplicativo", "Carro manutenção", "Carro melhorias", "Estacionamento", "Combustível"],
-                "Casa": ["Diarista Alimentação", "Diarista Limpeza", "Água", "Luz", "Jardineiro", "Manutenção Casa", "Material de limpeza"],
-                "Cuidado pessoal": ["Academia", "Cabeleireiro", "Estética", "Saúde"],
+                "Casa": ["Diarista Alimentação", "Diarista Limpeza", "Água", "Energia", "Jardineiro", "Manutenção Casa", "Material de limpeza"],
+                "Cuidado pessoal": ["Academia", "Cabeleireiro", "Estética", "Saúde", "Fisioterapia"],
                 "Vestuário": ["Roupas", "Calçados", "Acessórios"],
-                "Seguro": ["Carro", "Vida", "Residencial"],
-                "Esporte": ["Academia", "Equipamento"],
-                "Férias": ["Passagem", "Hospedagem", "Alimentação", "Passeios", "Presentes"]
+                "Estudos": ["Cursos", "Livros"],
+                "Seguro": ["Carro", "Pessoal", "Residencial"],
+                "Esporte": ["Academia", "Surf", "Tennis"],
+                "Férias": ["Passagem", "Hospedagem", "Alimentação", "Ticket e Ingressos", "Presentes"]
+            },
+            "Conciliação": {
+                "Cartão de Credito": ["CC Bradesco Infinity"]
+            },
+            "Despesa Empresa": {
+                "Parcelamento de impostos": ["Harmonia Locações", "Esgmax", "Soul Eventos"]
             },
             "Despesas Profissionais": {
-                "Taxa": ["Banco", "Plataforma","Corretor"],
+                "Taxa": ["Corretor"],
                 "Gestor": ["Dennis"],
-                "Estagiario": ["Estágio"],
-                "Projetos": ["Projeto1", "Projeto2", "Projeto3"]
+                "Estagiario": ["App","Projetos"],
+                "Assinatura Software": ["Microsoft"],
+                "Assinatura Email": ["GSUITE"]
+            },
+            "Despesas Projetos": {
+                "Cadastro Mobiliario Anual": ["Showme"],
+                "Proponente Parceito": ["Geovane"]
             },
             "Doação": {
                 "Presentes": ["Aniversário", "Natal"],
@@ -374,22 +393,33 @@ class Dados:
             "Emprestimos": {
                 "Bloqueio de conta": ["Bloqueio Judicial"], 
                 "Capital de giro": ["Mercedes","TonTon"],
+                "Dharma": ["Natal Experience"],
+                "Euro": ["Kite"],
                 "Financeamento":["Parcelamento Compass", "Parcelamento Mercedes"], 
                 "Juros":["Conta Corrente", "Cartão de Credito"], 
-                "Fundo Abreu":["Fundo Abreu"], 
+                "Fundo Abreu":["RA Mall", "Impostos"], 
+                "Miguel":["RA Mall", "Holding"],
                 "Ingrid":["Ingrid"], 
+                "RA Mall":["Condomínio"],
                 "Terceiros":["Terceiros"], 
-                "Encontro de contas":["Encontro de contas"], 
                 "Saque":["Saque"]
             },
             "Receitas": {
                 "Salário": ["Bonor"],
-                "Dharma": ["Showme"],
+                "Malca": ["Eventos", "Empréstimo"],
+                "Dharma": ["Showme", "Natal Experience", "Pé no Samba 2023", "Natal Beats 2023"],
                 "AirBnB": ["AirBnB"],
-                "Harmonia": ["RAMall"]
+                "Pai": ["Extra", "Empréstimo"],
+                "Harmonia": ["RA Mall"]
             },
-            "Entrada": {
-                "Aluguel": ["Harmonia"]
+            "Fundo": {
+                "Curto Prazo": ["Harmonia", "Eletrônicos", "Férias", "Escritório", "Kite"],
+                "Giro": ["Ingrid"],
+                "Liberdade Financeira": ["Liberdade Financeira"],
+                "Longo Prazo": ["Nova Casa", "Novo Carro"]
+            },
+            "Investimentos": {
+                "Kite": ["Kite"]
             },
             None:{
                 None:[None]
