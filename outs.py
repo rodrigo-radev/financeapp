@@ -372,9 +372,11 @@ def analise_contas():
 
         # Exibir gráfico
         fig = px.bar(df_cartao_periodo, x='Mês/Ano', y='Fatura',
-                    title=f"📈 Evolução das Faturas - {cartao_selecionado}",
-                    labels={'Fatura': 'Valor (R$)', 'Mês/Ano': 'Mês'},
-                    color_discrete_sequence=["#636EFA"])
+             title=f"📈 Evolução das Faturas - {cartao_selecionado}",
+             labels={'Fatura': 'Valor (R$)', 'Mês/Ano': 'Mês'},
+             color_discrete_sequence=["#636EFA"],
+             text='Fatura')  # <- adiciona o texto no gráfico
+        fig.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')  # <- formatação dos valores
         st.plotly_chart(fig, use_container_width=True)
 
         st.subheader(f"📊 Detalhamento por Categoria - {cartao_selecionado} ({ultimo_mes})")
@@ -400,8 +402,10 @@ def analise_contas():
                 color='Tipo Cartão',
                 barmode='group',
                 title=f"🧾 Gastos e Estornos por Categoria - {ultimo_mes}",
-                labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'}
+                labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'},
+                text='VALOR_ABS'
             )
+            fig_cat.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside', textfont_size=50)
             st.plotly_chart(fig_cat, use_container_width=True)
         else:
             st.write("Nenhum gasto ou estorno encontrado para esse cartão no mês selecionado.")
