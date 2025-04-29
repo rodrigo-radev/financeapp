@@ -1,6 +1,7 @@
 import json, os, csv
 import streamlit as st
 import pandas as pd
+from datetime import datetime
 
 def voltar():
     for key in st.session_state.keys():
@@ -147,7 +148,13 @@ def exibir_graficos():
 
     # Filtro por mês
     meses_disponiveis = sorted(df['Mês/Ano'].unique(), reverse=True)
-    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[:1])
+    # Pega o mês atual no formato 'YYYY-MM'
+    mes_atual = datetime.now().strftime('%Y-%m')
+
+    # Define o default como mês atual, se existir na lista
+    default_mes = [mes_atual] if mes_atual in meses_disponiveis else [meses_disponiveis[0]]
+
+    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=default_mes)
 
     if not meses_selecionados:
         st.warning("Selecione ao menos um mês para visualizar os dados.")
@@ -185,6 +192,10 @@ def exibir_graficos():
     st.subheader("🏦 Saldo Acumulado por Conta")
 
     saldo_contas = df.groupby('CONTA')['VALOR'].sum().reset_index()
+    
+    # Filtra apenas as contas que NÃO começam com "CC"
+    saldo_contas = saldo_contas[~saldo_contas['CONTA'].str.startswith('CC')]
+
     saldo_contas = saldo_contas.sort_values(by='VALOR', ascending=False)
 
     st.dataframe(saldo_contas, use_container_width=True)
@@ -215,11 +226,44 @@ def exibir_graficos():
     else:
         st.write("Nenhum gasto encontrado para este mês.")
 
+    #Gráficos por pote
+    st.subheader("📦 Receitas por Pote")
+    df_pote_receitas = df_filtrado[df_filtrado['Tipo'] == 'Receita'].groupby('POTE')['VALOR'].sum().reset_index()
+
+    if not df_pote_receitas.empty:
+        fig_pote_receitas = px.bar(df_pote_receitas, x='POTE', y='VALOR',
+                                title="Receitas por Pote",
+                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'})
+        st.plotly_chart(fig_pote_receitas, use_container_width=True)
+    else:
+        st.write("Nenhuma receita encontrada por Pote.")
+
+    st.subheader("📦 Gastos por Pote")
+    df_pote_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].groupby('POTE')['VALOR'].sum().reset_index()
+    df_pote_gastos['VALOR'] = df_pote_gastos['VALOR'].abs()
+
+    if not df_pote_gastos.empty:
+        fig_pote_gastos = px.bar(df_pote_gastos, x='POTE', y='VALOR',
+                                title="Gastos por Pote",
+                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'})
+        st.plotly_chart(fig_pote_gastos, use_container_width=True)
+    else:
+        st.write("Nenhum gasto encontrado por Pote.")
+
+
     # Gráficos
     if not df_receitas.empty:
         fig_receitas = px.bar(df_receitas, x=coluna_slct, y='VALOR', color=coluna_slct,
                               title=f'Receitas por {criterio} - {meses_selecionados}',
-                              labels={'VALOR': 'Valor (R$)', coluna_slct: criterio})
+                              labels={'VALOR': 'Valor (R$)', coluna_slct: criterio},
+                              text='VALOR')
+        fig_receitas.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
+        fig_receitas.update_layout(
+            uniformtext_minsize=8,
+            uniformtext_mode='hide',
+            yaxis_tickprefix='R$ ',
+            yaxis_tickformat=',.2f',
+            margin=dict(t=40, b=40))
         st.plotly_chart(fig_receitas)
     else:
         st.write("Nenhuma receita encontrada para este mês.")
@@ -227,7 +271,15 @@ def exibir_graficos():
     if not df_gastos.empty:
         fig_gastos = px.bar(df_gastos, x=coluna_slct, y='VALOR', color=coluna_slct,
                             title=f'Gastos por {criterio} - {meses_selecionados}',
-                            labels={'VALOR': 'Valor (R$)', coluna_slct: criterio})
+                            labels={'VALOR': 'Valor (R$)', coluna_slct: criterio},
+                            text='VALOR')
+        fig_gastos.update_traces(texttemplate='R$ %{text:,.2f}', textposition='auto')
+        fig_gastos.update_layout(
+            uniformtext_minsize=8,
+            uniformtext_mode='hide',
+            yaxis_tickprefix='R$ ',
+            yaxis_tickformat=',.2f',
+            margin=dict(t=40, b=40))    
         st.plotly_chart(fig_gastos)
     else:
         st.write("Nenhum gasto encontrado para este mês.")
@@ -319,7 +371,13 @@ def analise_contas():
 
     # Filtro por mês
     meses_disponiveis = sorted(df['Mês/Ano'].unique(), reverse=True)
-    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=meses_disponiveis[17])
+    # Pega o mês atual no formato 'YYYY-MM'
+    mes_atual = datetime.now().strftime('%Y-%m')
+
+    # Define o default como mês atual, se existir na lista
+    default_mes = [mes_atual] if mes_atual in meses_disponiveis else [meses_disponiveis[0]]
+
+    meses_selecionados = st.multiselect("📅 Selecione o(s) mês(es)", meses_disponiveis, default=default_mes)
 
     if not meses_selecionados:
         st.warning("Selecione ao menos um mês para visualizar os dados.")
@@ -375,7 +433,9 @@ def analise_contas():
         fig = px.bar(df_cartao_periodo, x='Mês/Ano', y='Fatura',
                     title=f"📈 Evolução das Faturas - {cartao_selecionado}",
                     labels={'Fatura': 'Valor (R$)', 'Mês/Ano': 'Mês'},
+                    text='Fatura',
                     color_discrete_sequence=["#636EFA"])
+        fig.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
         st.plotly_chart(fig, use_container_width=True, on_select="rerun")
 
 
@@ -415,8 +475,10 @@ def analise_contas():
                 color='Tipo Cartão',
                 barmode='group',
                 title=f"🧾 Gastos e Estornos por Categoria - {ultimo_mes}",
-                labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'}
+                labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'},
+                text ='VALOR_ABS'
             )
+            fig.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
             st.plotly_chart(fig_cat, use_container_width=True)
             
         else:
