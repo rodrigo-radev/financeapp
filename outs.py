@@ -303,6 +303,7 @@ def analise_contas():
     import streamlit as st
     import pandas as pd
     import perfil
+    from streamlit_plotly_events import plotly_events
 
     df = pd.read_csv("database/export.csv")
     df['VALOR'] = pd.to_numeric(df['VALOR'])
@@ -375,7 +376,21 @@ def analise_contas():
                     title=f"📈 Evolução das Faturas - {cartao_selecionado}",
                     labels={'Fatura': 'Valor (R$)', 'Mês/Ano': 'Mês'},
                     color_discrete_sequence=["#636EFA"])
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True, on_select="rerun")
+
+
+        clicked_data = plotly_events(fig, click_event=True, hover_event=False)
+        if clicked_data:
+            # Get the index of the clicked bar
+            index = clicked_data[0]['pointIndex']
+            # Create and show a dictionary of the selected data
+            selected_dict = {key: df_cartao_periodo[key][index] for key in df_cartao_periodo}
+            st.write("Selected data:")
+            st.json(selected_dict)
+            st.popover(selected_dict)
+        else:
+            st.write("Click a bar to see details.")
+
 
         st.subheader(f"📊 Detalhamento por Categoria - {cartao_selecionado} ({ultimo_mes})")
         # Filtrar apenas o mês base (o último mês selecionado)
@@ -403,6 +418,7 @@ def analise_contas():
                 labels={'VALOR_ABS': 'Valor (R$)', 'CATEGORIA': 'Categoria'}
             )
             st.plotly_chart(fig_cat, use_container_width=True)
+            
         else:
             st.write("Nenhum gasto ou estorno encontrado para esse cartão no mês selecionado.")
 
