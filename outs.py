@@ -190,7 +190,7 @@ def exibir_graficos():
     saldo_total = total_receitas_geral - total_gastos_geral
 
     st.subheader("🏦 Saldo Acumulado por Conta")
-
+    
     saldo_contas = df.groupby('CONTA')['VALOR'].sum().reset_index()
     
     # Filtra apenas as contas que NÃO começam com "CC"
@@ -203,9 +203,26 @@ def exibir_graficos():
     st.subheader(f"💳 Totais por Conta no(s) mês(es) selecionado(s): {', '.join(meses_selecionados)}")
 
     totais_contas_mes = df_filtrado.groupby('CONTA')['VALOR'].sum().reset_index()
+    totais_contas_mes = totais_contas_mes[~totais_contas_mes['CONTA'].str.startswith('CC')]
     totais_contas_mes = totais_contas_mes.sort_values(by='VALOR', ascending=False)
 
     st.dataframe(totais_contas_mes, use_container_width=True)
+
+    # Tabela de entradas (VALOR > 0)
+    st.markdown("#### 📈 Entradas por Conta")
+    entradas = df_filtrado[df_filtrado['VALOR'] > 0].groupby('CONTA')['VALOR'].sum().reset_index()
+    entradas = entradas[~entradas['CONTA'].str.startswith('CC')]
+    entradas = entradas.sort_values(by='VALOR', ascending=False)
+
+    st.dataframe(entradas, use_container_width=True)
+
+    # Tabela de saídas (VALOR < 0)
+    st.markdown("#### 📉 Saídas por Conta")
+    saidas = df_filtrado[df_filtrado['VALOR'] < 0].groupby('CONTA')['VALOR'].sum().reset_index()
+    saidas = saidas[~saidas['CONTA'].str.startswith('CC')]
+    saidas = saidas.sort_values(by='VALOR')
+
+    st.dataframe(saidas, use_container_width=True)
 
     st.subheader("📊 Visão Geral Acumulada")
     col4, col5, col6 = st.columns(3)
@@ -233,7 +250,9 @@ def exibir_graficos():
     if not df_pote_receitas.empty:
         fig_pote_receitas = px.bar(df_pote_receitas, x='POTE', y='VALOR',
                                 title="Receitas por Pote",
-                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'})
+                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'},
+                                text='VALOR')
+        fig_pote_receitas.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
         st.plotly_chart(fig_pote_receitas, use_container_width=True)
     else:
         st.write("Nenhuma receita encontrada por Pote.")
@@ -245,7 +264,9 @@ def exibir_graficos():
     if not df_pote_gastos.empty:
         fig_pote_gastos = px.bar(df_pote_gastos, x='POTE', y='VALOR',
                                 title="Gastos por Pote",
-                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'})
+                                labels={'VALOR': 'Valor (R$)', 'POTE': 'Pote'},
+                                text='VALOR')
+        fig_pote_gastos.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
         st.plotly_chart(fig_pote_gastos, use_container_width=True)
     else:
         st.write("Nenhum gasto encontrado por Pote.")
@@ -301,7 +322,9 @@ def exibir_graficos():
         df_subcategorias = df_sub.groupby(['SUBCATEGORIA', 'Tipo'])['VALOR'].sum().reset_index()
         if not df_subcategorias.empty:
             fig_subcategorias = px.bar(df_subcategorias, x='SUBCATEGORIA', y='VALOR', color='Tipo', barmode='group',
-                                       title=f"📊 Receitas e Gastos por Subcategoria - {categoria_analisada}")
+                                       title=f"📊 Receitas e Gastos por Subcategoria - {categoria_analisada}", 
+                                       text='VALOR',)
+            fig_subcategorias.update_traces(texttemplate='R$ %{text:,.2f}', textposition='outside')
             st.plotly_chart(fig_subcategorias)
 
         col1, col2 = st.columns(2)

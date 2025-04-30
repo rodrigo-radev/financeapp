@@ -23,9 +23,9 @@ def home():
         if st.button("Entrada manual"):
             st.session_state.page = "manual_entry"
     with col3:
-        if st.button("Exibir gráficos"):
+        if st.button("Contas"):
             st.session_state.page = "graficos"
-        if st.button("Análise por conta"):
+        if st.button("Cartões"):
             st.session_state.page = "contas"
         if st.button("Visualizar base de dados"):
             st.session_state.page = "base de dados"
